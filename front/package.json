@@ -9,7 +9,7 @@
     "fix:eslint": "eslint . --ext .js,.ts,.jsx,.tsx --fix",
     "fix:prettier": "prettier --write .",
     "eslint": "eslint . --ext .js,.ts,.jsx,.tsx",
-    "prepare": "husky install",
+    "prepare": "cd .. && husky install ./front/.husky",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
