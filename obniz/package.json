@@ -7,5 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "naoki eguchi",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "obniz": "^3.19.1"
+  }
 }
