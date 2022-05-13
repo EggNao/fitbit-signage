@@ -1,0 +1,5 @@
+Django==3.2
+mysqlclient
+djangorestframework
+django-filter
+python-dotenv
