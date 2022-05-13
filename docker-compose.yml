@@ -22,6 +22,7 @@ services:
       - fitbit-signage-mysql:/var/lib/mysql
       - ./mysql/my.cnf:/etc/mysql/conf.d/my.cnf
 
+  # Django APIコンテナ
   api:
     build: ./fitbit_signage_api/
     container_name: "fitbit-signage-api"
