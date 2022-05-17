@@ -3,3 +3,5 @@ mysqlclient
 djangorestframework
 django-filter
 python-dotenv
+djangorestframework-camel-case
+fitbit

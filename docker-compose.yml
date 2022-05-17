@@ -38,6 +38,5 @@ services:
 
 # volumeの定義
 volumes:
-
   fitbit-signage-mysql:
     driver: local
