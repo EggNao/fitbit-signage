@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "clsx": "^1.1.1",
+    "dayjs": "^1.11.2",
     "firebase": "^9.8.1",
     "react": "^17.0.2",
     "react-apexcharts": "^1.4.0",
