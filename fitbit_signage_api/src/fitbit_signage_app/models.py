@@ -15,8 +15,8 @@ class User(models.Model):
 class DailyScore(models.Model):
     user = models.ForeignKey(User, to_field='user_id', on_delete=models.CASCADE, related_name='user_score')
     sleep_score = models.IntegerField()
-    steps = models.IntegerField()
-    calories = models.IntegerField()
+    steps = models.IntegerField(default=0)
+    calories = models.IntegerField(default=0)
     achievement = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -19,6 +19,5 @@ class DailyScoreSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = DailyScore
-        field = ('user', 'sleep_score', 'steps', 'calories', 'achievement')
-        read_only_fields = ('user')
+        fields = ('user', 'sleep_score', 'steps', 'calories', 'achievement')
 
