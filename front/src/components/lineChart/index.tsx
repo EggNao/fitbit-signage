@@ -1,11 +1,6 @@
 import dayjs from 'dayjs'
 import Chart from 'react-apexcharts'
 
-export type DataType = {
-  date: string
-  score: number
-}
-
 export type LineChartProps = {
   dataArray: { [key: string]: number[] }
   dateArray: string[]
