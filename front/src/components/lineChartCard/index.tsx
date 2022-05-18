@@ -12,7 +12,7 @@ export const LineChartCard: React.VFC<LineChartCardProps> = ({ dataArray, dateAr
   return (
     <div className='border rounded drop-shadow-md p-10 m-2'>
       <span className='text-3xl'>{text}</span>
-      <LineChart dataArray={dataArray} dateArray={dateArray} scoreType={scoreType} color={color}></LineChart>
+      <LineChart dataArray={dataArray} dateArray={dateArray} scoreType={scoreType} color={color} />
     </div>
   )
 }
