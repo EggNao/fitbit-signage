@@ -7,50 +7,25 @@ export type DataType = {
 }
 
 export type LineChartProps = {
-  dataArray: DataType[]
+  dataArray: { [key: string]: number[] }
+  dateArray: string[]
   scoreType: 'walk' | 'sleep' | 'calorie'
 }
 
-export const LineChart: React.VFC<LineChartProps> = ({ dataArray, scoreType }) => {
-  const walkData = dataArray.map((doc) => ({
-    x: dayjs(doc.date).toDate(),
-    y: doc.score,
-  }))
-  const sleepData = dataArray.map((doc) => ({
-    x: dayjs(doc.date).toDate(),
-    y: doc.score,
-  }))
-  const calorieData = dataArray.map((doc) => ({
-    x: dayjs(doc.date).toDate(),
-    y: doc.score,
-  }))
-
-  // const dataList = [
-  //   {
-  //     walk: {
-  //       name: 'walk',
-  //       data: walkData,
-  //     },
-  //     sleep: {
-  //       name: 'sleep',
-  //       data: sleepData,
-  //     },
-  //     calorie: {
-  //       name: 'calorie',
-  //       data: calorieData,
-  //     },
-  //   },
-  // ]
-
-  const walkataList = [{ name: 'walk', data: walkData }]
-  const sleepDataList = [{ name: 'sleep', data: sleepData }]
-  const calorieDataList = [{ name: 'calorie', data: calorieData }]
+export const LineChart: React.VFC<LineChartProps> = ({ dataArray, dateArray, scoreType }) => {
+  const walkataList = [{ name: 'walk', data: dataArray[scoreType] }]
+  const sleepDataList = [{ name: 'sleep', data: dataArray[scoreType] }]
+  const calorieDataList = [{ name: 'calorie', data: dataArray[scoreType] }]
 
   const dataList = {
     walk: walkataList,
     sleep: sleepDataList,
     calorie: calorieDataList,
   }
+
+  const formatDateArray = dateArray.map((data) => {
+    return dayjs(data).toDate()
+  })
 
   const options = {
     chart: {
@@ -67,7 +42,7 @@ export const LineChart: React.VFC<LineChartProps> = ({ dataArray, scoreType }) =
       },
     },
     xaxis: {
-      type: 'datetime' as ApexXAxis['type'],
+      categories: formatDateArray,
     },
     yaxis: {
       title: { text: scoreType },

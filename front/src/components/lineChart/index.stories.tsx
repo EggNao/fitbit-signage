@@ -9,36 +9,12 @@ export default {
 
 const Template: ComponentStory<typeof LineChart> = (args) => <LineChart {...args} />
 const defaultArgs: LineChartProps = {
-  dataArray: [
-    {
-      date: '20220512',
-      score: 5032,
-    },
-    {
-      date: '20220513',
-      score: 3845,
-    },
-    {
-      date: '20220514',
-      score: 10684,
-    },
-    {
-      date: '20220515',
-      score: 2048,
-    },
-    {
-      date: '20220516',
-      score: 6970,
-    },
-    {
-      date: '20220517',
-      score: 4058,
-    },
-    {
-      date: '20220518',
-      score: 3857,
-    },
-  ],
+  dataArray: {
+    walk: [3245, 2423, 2353, 5647, 6756, 3464, 6325],
+    sleep: [87, 67, 78, 98, 76, 77, 68],
+    calorie: [2345, 3023, 2653, 5647, 2256, 1864, 2725],
+  },
+  dateArray: ['20220512', '20220513', '20220514', '20220515', '20220516', '20220517', '20220518'],
   scoreType: 'walk',
 }
 
