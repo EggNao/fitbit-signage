@@ -1,15 +1,16 @@
 import { RadialBarChart } from '../radialBarChart'
 
 export type RadialBarChartCardProps = {
-  radial: { [key: string]: number[] } // 割合%
+  goal: { [key: string]: number }
+  value: { [key: string]: number }
 }
 
-export const RadialBarChartCard: React.VFC<RadialBarChartCardProps> = ({ radial }) => {
+export const RadialBarChartCard: React.VFC<RadialBarChartCardProps> = ({ goal, value }) => {
   return (
     <div className='border rounded drop-shadow-md p-2 m-2 flex justify-center'>
-      <RadialBarChart radial={radial} scoreType={'steps'} color={'green'} />
-      <RadialBarChart radial={radial} scoreType={'calorie'} color={'orenge'} />
-      <RadialBarChart radial={radial} scoreType={'sleep'} color={'lightblue'} />
+      <RadialBarChart goal={goal} value={value} scoreType={'steps'} color={'green'} />
+      <RadialBarChart goal={goal} value={value} scoreType={'calorie'} color={'orenge'} />
+      <RadialBarChart goal={goal} value={value} scoreType={'sleep'} color={'lightblue'} />
     </div>
   )
 }

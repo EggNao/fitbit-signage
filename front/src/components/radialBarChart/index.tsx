@@ -5,12 +5,13 @@ import sleepImg from '~/assets/sleep.svg'
 import stepsImg from '~/assets/steps.svg'
 
 export type RadialBarChartProps = {
-  radial: { [key: string]: number[] } // 割合%
   scoreType: 'steps' | 'sleep' | 'calorie'
   color: 'green' | 'red' | 'orenge' | 'blue' | 'lightblue' | 'yellow' | 'purple'
+  goal: { [key: string]: number }
+  value: { [key: string]: number }
 }
 
-export const RadialBarChart: React.VFC<RadialBarChartProps> = ({ radial, scoreType, color }) => {
+export const RadialBarChart: React.VFC<RadialBarChartProps> = ({ scoreType, color, goal, value }) => {
   const colorType = {
     green: ['#05CD99'],
     red: ['#EE5D50'],
@@ -22,9 +23,13 @@ export const RadialBarChart: React.VFC<RadialBarChartProps> = ({ radial, scoreTy
   }
   const imgSrc = { steps: stepsImg, sleep: sleepImg, calorie: calorieImg }
 
+  const radial = value[scoreType] / goal[scoreType] < 1 ? Math.trunc((value[scoreType] / goal[scoreType]) * 100) : 100
+
+  const text = { steps: 'steps', sleep: 'minutes', calorie: 'kcal' }
+
   const options = {
     colors: colorType[color],
-    series: radial[scoreType],
+    series: [radial],
     labels: [scoreType],
     plotOptions: {
       radialBar: {
@@ -53,7 +58,11 @@ export const RadialBarChart: React.VFC<RadialBarChartProps> = ({ radial, scoreTy
   }
   return (
     <div>
-      <Chart type='radialBar' options={options} series={radial[scoreType]} />
+      <Chart className='m-auto' type='radialBar' options={options} series={[radial]} />
+      <h2 className='text-center text-2xl'>
+        {String(value[scoreType])}&nbsp;/&nbsp;{String(goal[scoreType])}{' '}
+        <span className='text-lg'>{text[scoreType]}</span>
+      </h2>
     </div>
   )
 }

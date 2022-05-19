@@ -9,11 +9,8 @@ export default {
 
 const Template: ComponentStory<typeof RadialBarChartCard> = (args) => <RadialBarChartCard {...args} />
 const defaultArgs: RadialBarChartCardProps = {
-  radial: {
-    steps: [40],
-    sleep: [87],
-    calorie: [95],
-  },
+  goal: { steps: 8000, calorie: 3000, sleep: 360 },
+  value: { steps: 4738, calorie: 2391, sleep: 240 },
 }
 
 export const Default = Template.bind({})
