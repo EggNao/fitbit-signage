@@ -20,4 +20,5 @@ from fitbit_signage_app import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('fitbit/', include('fitbit_signage_app.urls.fitbit')),
+    path('week/', include('fitbit_signage_app.urls.week'))
 ]
