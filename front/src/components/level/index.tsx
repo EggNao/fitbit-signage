@@ -16,7 +16,7 @@ export const Level: React.VFC<LevelProps> = ({ level, rate }) => {
   ]
   const options = {
     chart: {
-      type: 'bar',
+      type: 'bar' as ApexChart['type'],
       height: 350,
     },
     plotOptions: {
