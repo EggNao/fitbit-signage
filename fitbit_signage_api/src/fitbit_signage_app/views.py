@@ -1,5 +1,3 @@
-from http.client import OK
-from tkinter.tix import Tree
 from django.shortcuts import render, get_object_or_404, get_list_or_404, redirect
 from django.http import Http404
 from django.http import HttpResponse
@@ -13,6 +11,7 @@ from rest_framework.response import Response
 
 import datetime
 import fitbit
+import pandas as pd
 
 from .models import User, DailyScore, UserGoal, UserRank
 from .serializers import UserSerializer, DailyScoreSerializer, UserGoalSerializer, UserRankSerializer
@@ -338,9 +337,69 @@ class WeekDataAPIView(views.APIView):
         
         return Response(data=return_data, status=status.HTTP_200_OK)
     
+    
+class StepPerHourAPIView(views.APIView):
         
+    # 今日の日付を取得
+    TODAY = str(datetime.date.today())
+    
+    def get(self, request: Request, user_id: str, *args, **kwargs):
+    
+        '''
+        user_idに紐ずくユーザの1時間ごとの歩数データを返す
         
+        レスポンス形式
+        {
+            "steps": [int] // 6:00 ~ 20:00
+            "goals": [int]
+        }
+        '''
         
+        # ユーザ情報の取り出し
+        client_obj = get_object_or_404(User, user_id=user_id)
+        # FitbitでClient情報を取得
+        client = fitbit.Fitbit(client_obj.client_id, client_obj.client_secret,
+                    access_token = client_obj.access_token,
+                    refresh_token = client_obj.refresh_token,
+                    refresh_cb=updateToken)
         
+        # 1日の歩数データを取得
+        step_data = client.intraday_time_series('activities/steps', base_date=self.TODAY, detail_level='15min', start_time="06:00", end_time="20:00")["activities-steps-intraday"]["dataset"]
+        # transfer DataFrame
+        df_step_data = pd.DataFrame.from_dict(step_data)
+        # timeにindexを貼る
+        df_step_data.index = df_step_data["time"]
         
+        # １時間ごとの歩数データリスト
+        steps = list()
+       
+        for i in range(14):
+            
+            # 取得時刻の開始と終了
+            start_time = datetime.time(6+i, 0, 0)
+            end_time = datetime.time(7+i, 0, 0)
+            
+            # datetimeをstrに変換
+            str_start_time = start_time.strftime("%H:%M:%S")
+            str_end_time = end_time.strftime("%H:%M:%S")
+            
+            # １時間の歩数データ
+            df_step_hour = df_step_data[str_start_time : str_end_time]
+            steps.append(df_step_hour['value'].sum())
+            
         
+        # response data
+        return_data = {
+            'steps': steps,
+            'goals': [10, 15, 20, 25, 50, 406, 1854, 1599, 1252, 3598, 1964, 300, 1774, 1800] # モックデータ
+        }
+                        
+        return Response(data=return_data, status=status.HTTP_200_OK)
+        
+    
+
+    
+    
+    
+    
+    
