@@ -2,7 +2,7 @@ import Chart from 'react-apexcharts'
 
 export type RadialBarChartProps = {
   radial: { [key: string]: number[] } // 割合%
-  scoreType: 'walk' | 'sleep' | 'calorie'
+  scoreType: 'steps' | 'sleep' | 'calorie'
   color: 'green' | 'red' | 'orenge' | 'blue' | 'lightblue' | 'yellow' | 'purple'
 }
 

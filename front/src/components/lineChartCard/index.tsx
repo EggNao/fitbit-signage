@@ -3,7 +3,7 @@ import { LineChart } from '../lineChart'
 export type LineChartCardProps = {
   dataArray: { [key: string]: number[] }
   dateArray: string[]
-  scoreType: 'walk' | 'sleep' | 'calorie'
+  scoreType: 'steps' | 'sleep' | 'calorie'
   color: 'green' | 'red' | 'orenge' | 'blue' | 'lightblue' | 'yellow' | 'purple'
   text: string
 }

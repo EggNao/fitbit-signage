@@ -4,17 +4,17 @@ import Chart from 'react-apexcharts'
 export type LineChartProps = {
   dataArray: { [key: string]: number[] }
   dateArray: string[]
-  scoreType: 'walk' | 'sleep' | 'calorie'
+  scoreType: 'steps' | 'sleep' | 'calorie'
   color: 'green' | 'red' | 'orenge' | 'blue' | 'lightblue' | 'yellow' | 'purple'
 }
 
 export const LineChart: React.VFC<LineChartProps> = ({ dataArray, dateArray, scoreType, color }) => {
-  const walkataList = [{ name: 'walk', data: dataArray[scoreType] }]
+  const stepsDataList = [{ name: 'steps', data: dataArray[scoreType] }]
   const sleepDataList = [{ name: 'sleep', data: dataArray[scoreType] }]
   const calorieDataList = [{ name: 'calorie', data: dataArray[scoreType] }]
 
   const dataList = {
-    walk: walkataList,
+    steps: stepsDataList,
     sleep: sleepDataList,
     calorie: calorieDataList,
   }

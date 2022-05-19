@@ -10,11 +10,11 @@ export default {
 const Template: ComponentStory<typeof RadialBarChart> = (args) => <RadialBarChart {...args} />
 const defaultArgs: RadialBarChartProps = {
   radial: {
-    walk: [40],
+    steps: [40],
     sleep: [87],
     calorie: [95],
   },
-  scoreType: 'walk',
+  scoreType: 'steps',
   color: 'purple',
 }
 
