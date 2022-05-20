@@ -49,7 +49,7 @@ export const RadialBarChart: React.VFC<RadialBarChartProps> = ({ scoreType, colo
           value: {
             show: true,
             color: '#333',
-            offsetY: 90,
+            offsetY: 110,
             fontSize: '18px',
           },
         },
@@ -58,7 +58,7 @@ export const RadialBarChart: React.VFC<RadialBarChartProps> = ({ scoreType, colo
   }
   return (
     <div>
-      <Chart className='m-auto' type='radialBar' options={options} series={[radial]} width='400' />
+      <Chart className='m-auto' type='radialBar' options={options} series={[radial]} />
       <h2 className='text-center text-base'>
         {String(value[scoreType])}&nbsp;/&nbsp;{String(goal[scoreType])}{' '}
         <span className='text-sm'>{text[scoreType]}</span>
