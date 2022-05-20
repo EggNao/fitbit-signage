@@ -4,8 +4,6 @@ import { Link } from 'react-location'
 
 import { useRoot } from './hook'
 
-import logo from '~/assets/logo.svg'
-import { Button } from '~/components/button'
 import { CommentCard } from '~/components/commentCard'
 import { Level } from '~/components/level'
 import { LineChartCard } from '~/components/lineChartCard'
@@ -14,13 +12,43 @@ import { WalkChartCard } from '~/components/walkChartCard'
 import { PATH } from '~/router/path'
 
 export const RootPage: React.VFC = () => {
-  const [name, setName] = useState<string>('')
+  // const [name, setName] = useState<string>('江口さん')
+  // const [todayMoveData, setTodayMoveData] = useState()
+  // const [goals, setGoals] = useState()
+  // const [rank, setRank] = useState()
+  // const [weekMoveData, setWeekMoveData] = useState()
+  // const [stamp, setStamp] = useState()
+  // const [todaySteps, setTodaySteps] = useState()
 
   useEffect(() => {
-    axios
-      .get('http://localhost:8000/fitbit/9YWMB5')
-      .then((response) => console.log(response.data))
-      .catch((error) => console.log(error))
+    const fetchData = async () => {
+      console.log('aaa')
+      await axios
+        .get('http://localhost:8000/fitbit/9YWMB5')
+        .then((response) => console.log('fitbit', response.data))
+        .catch((error) => console.log(error))
+      await axios
+        .get('http://localhost:8000/fitbit/goals/9YWMB5')
+        .then((response) => console.log('fitbit/goals', response.data))
+        .catch((error) => console.log(error))
+      await axios
+        .get('http://localhost:8000/week/rank/9YWMB5')
+        .then((response) => console.log('fitbit/week/rank', response.data))
+        .catch((error) => console.log(error))
+      await axios
+        .get('http://localhost:8000/week/9YWMB5')
+        .then((response) => console.log('fitbit/week', response.data))
+        .catch((error) => console.log(error))
+      await axios
+        .get('http://localhost:8000/week/stamp/9YWMB5')
+        .then((response) => console.log('fitbit/stamp', response.data))
+        .catch((error) => console.log(error))
+      await axios
+        .get('http://localhost:8000/fitbit/steps/9YHK8W')
+        .then((response) => console.log('fitbit/steps', response.data))
+        .catch((error) => console.log(error))
+    }
+    fetchData()
   }, [])
 
   return (

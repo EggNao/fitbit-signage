@@ -8,9 +8,15 @@ export type RadialBarChartCardProps = {
 export const RadialBarChartCard: React.VFC<RadialBarChartCardProps> = ({ goal, value }) => {
   return (
     <div className='bg-white border rounded-lg drop-shadow-md p-2 m-2 flex justify-center'>
-      <RadialBarChart goal={goal} value={value} scoreType={'steps'} color={'green'} />
-      <RadialBarChart goal={goal} value={value} scoreType={'calorie'} color={'orenge'} />
-      <RadialBarChart goal={goal} value={value} scoreType={'sleep'} color={'lightblue'} />
+      <div className='w-1/3'>
+        <RadialBarChart goal={goal} value={value} scoreType={'steps'} color={'green'} />
+      </div>
+      <div className='w-1/3'>
+        <RadialBarChart goal={goal} value={value} scoreType={'calorie'} color={'orenge'} />
+      </div>
+      <div className='w-1/3'>
+        <RadialBarChart goal={goal} value={value} scoreType={'sleep'} color={'lightblue'} />
+      </div>
     </div>
   )
 }
