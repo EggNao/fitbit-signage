@@ -401,6 +401,7 @@ class StepPerHourAPIView(views.APIView):
         }
         '''
         
+        
         # ユーザ情報の取り出し
         client_obj = get_object_or_404(User, user_id=user_id)
         # FitbitでClient情報を取得
@@ -408,6 +409,56 @@ class StepPerHourAPIView(views.APIView):
                     access_token = client_obj.access_token,
                     refresh_token = client_obj.refresh_token,
                     refresh_cb=updateToken)
+        
+        # 成人男性の1日の平均歩数データ
+        adult_step_data = [80, 400, 1840, 400, 80, 80, 800, 80, 80, 80, 400, 1760, 1680, 800, 80]
+        
+        # 今日の目標値
+        steps_goal = adult_step_data
+        
+        
+        #### 過去のデータ #####
+        
+        # 過去７日間の日付
+        date_range = [self.TODAY - datetime.timedelta(days=i) for i in range(1, 7)]
+        
+        # 過去１週間のデータを取得
+        for date in date_range:
+            daily_data =  DailyScore.objects.filter(user=user_id, created_at__range=(date, date+datetime.timedelta(days=1))).order_by('-created_at').first()
+            # 目標を達成していたかどうか
+            if daily_data and daily_data.achievement:
+                
+                # 過去の歩数データを取得
+                step_data_ago = client.intraday_time_series('activities/steps', base_date=date, detail_level='15min', start_time="06:00", end_time="20:00")["activities-steps-intraday"]["dataset"]
+                # transfer DataFrame
+                df_step_data_ago = pd.DataFrame.from_dict(step_data_ago)
+                # timeにindexを貼る
+                df_step_data_ago.index = df_step_data_ago["time"]
+                
+                # 過去の１時間ごとの歩数データリスト
+                steps_ago = list()
+                
+                for i in range(14):
+                    # 取得時刻の開始と終了
+                    start_time = datetime.time(6+i, 0, 0)
+                    end_time = datetime.time(7+i, 0, 0)
+                    
+                    # datetimeをstrに変換
+                    str_start_time = start_time.strftime("%H:%M:%S")
+                    str_end_time = end_time.strftime("%H:%M:%S")
+                    
+                    # １時間の歩数データ
+                    df_step_hour_ago = df_step_data_ago[str_start_time : str_end_time]
+                    steps_ago.append(df_step_hour_ago['value'].sum())
+                
+                steps_goal = steps_ago
+                
+                # 近日のデータが取れたのでループを抜ける
+                break
+                
+                
+        
+        #### 今日のデータ #####
         
         # 1日の歩数データを取得
         step_data = client.intraday_time_series('activities/steps', base_date=str(self.TODAY), detail_level='15min', start_time="06:00", end_time="20:00")["activities-steps-intraday"]["dataset"]
@@ -420,7 +471,6 @@ class StepPerHourAPIView(views.APIView):
         steps = list()
        
         for i in range(14):
-            
             # 取得時刻の開始と終了
             start_time = datetime.time(6+i, 0, 0)
             end_time = datetime.time(7+i, 0, 0)
@@ -437,7 +487,7 @@ class StepPerHourAPIView(views.APIView):
         # response data
         return_data = {
             'steps': steps,
-            'goals': [10, 15, 20, 25, 50, 406, 1854, 1599, 1252, 3598, 1964, 300, 1774, 1800] # モックデータ
+            'goals': steps_goal
         }
                         
         return Response(data=return_data, status=status.HTTP_200_OK)
