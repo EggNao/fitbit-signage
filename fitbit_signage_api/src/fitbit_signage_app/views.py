@@ -1,4 +1,3 @@
-from ast import Return
 from django.shortcuts import render, get_object_or_404, get_list_or_404, redirect
 from django.http import Http404
 from django.http import HttpResponse
@@ -84,7 +83,7 @@ class FitbitAPIView(views.APIView):
     serializer_class = DailyScoreSerializer
     
     # 今日の日付を取得
-    TODAY = str(datetime.date.today())
+    TODAY = datetime.date.today()
     
     def get(self, request: Request, user_id: str, *args, **kwargs):
         
@@ -95,7 +94,7 @@ class FitbitAPIView(views.APIView):
         {
             'steps': [int],
 	        'calories': [int],
-	        'sleep_efficiency': [int]
+	        'sleep': [int]
         }
         
         '''
@@ -109,11 +108,10 @@ class FitbitAPIView(views.APIView):
                        refresh_cb=updateToken)
         
 
-        datetime_today = datetime.date.today()
-        today_data = DailyScore.objects.filter(user=user_id, created_at__range=(datetime_today, datetime_today+datetime.timedelta(days=1))).order_by('-created_at').first()
+        today_data = DailyScore.objects.filter(user=user_id, created_at__range=(self.TODAY, self.TODAY+datetime.timedelta(days=1))).order_by('-created_at').first()
         
         # 歩数とカロリーの取得
-        daily_data = client.make_request("https://api.fitbit.com/1/user/-/activities/date/"+ self.TODAY +".json")
+        daily_data = client.make_request("https://api.fitbit.com/1/user/-/activities/date/"+ str(self.TODAY) +".json")
         steps_daily = daily_data['summary']['steps']
         calories_daily = daily_data['summary']['caloriesOut']
         
@@ -130,7 +128,7 @@ class FitbitAPIView(views.APIView):
             
         else: # 今日まだ取得していない場合
             # 睡眠データ取得
-            sleep_data = client.make_request("https://api.fitbit.com/1.2/user/-/sleep/date/"+ self.TODAY +".json")['sleep']
+            sleep_data = client.make_request("https://api.fitbit.com/1.2/user/-/sleep/date/"+ str(self.TODAY) +".json")['sleep']
             if sleep_data:
                 # 睡眠効率を取得
                 sleep_efficiency = sleep_data['efficiency']
@@ -149,11 +147,53 @@ class FitbitAPIView(views.APIView):
         return_data = {
             'steps': [int(steps_daily)],
             'calorie': [int(calories_daily)],
-            'sleep_efficiency': [sleep_efficiency],
-            'sleep_time': [sleep_mitutes]
+            'sleep': [sleep_mitutes]
         }
         
         return Response(data=return_data, status=status.HTTP_200_OK)
+    
+    
+    def patch(self, request: Request, *args, **kwargs):
+        
+        '''
+        日付が更新時に全員分のDailyScoreを更新する
+        
+        レスポンス形式
+        
+        (成功時)
+        {
+            result: "success"
+        }
+        '''
+        
+        user_all = User.objects.all()
+        
+        # 全ユーザの今日の記録を更新
+        for user in user_all:
+            print(user.user_id)
+            # FitbitでClient情報を取得
+            client = fitbit.Fitbit(user.client_id, user.client_secret,
+                        access_token = user.access_token,
+                        refresh_token = user.refresh_token,
+                        refresh_cb=updateToken)
+            
+            # 歩数とカロリーの取得
+            daily_data = client.make_request("https://api.fitbit.com/1/user/-/activities/date/"+ str(self.TODAY) +".json")
+            steps_daily = daily_data['summary']['steps']
+            calories_daily = daily_data['summary']['caloriesOut']
+            
+    
+            today_data = DailyScore.objects.filter(user=user.user_id, created_at__range=(self.TODAY, self.TODAY+datetime.timedelta(days=1))).order_by('-created_at').first()
+            
+            
+            # 今日のデータの更新
+            serializer = self.serializer_class(instance=today_data, data={"steps": steps_daily, "calories": calories_daily}, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            
+            
+        return Response(data={'result': 'success'}, status=status.HTTP_200_OK)
+        
     
     
 class RankAPIView(views.APIView):
@@ -167,7 +207,7 @@ class RankAPIView(views.APIView):
         
         レスポンス形式
         {
-            "rank": int
+            "level": int
             "rate": float
         }
         '''
@@ -228,7 +268,7 @@ class RankAPIView(views.APIView):
         
         # response data
         return_data = {
-            'rank': rank,
+            'level': rank,
             'rate': rate,
         }
       
@@ -347,7 +387,7 @@ class WeekDataAPIView(views.APIView):
 class StepPerHourAPIView(views.APIView):
         
     # 今日の日付を取得
-    TODAY = str(datetime.date.today())
+    TODAY = datetime.date.today()
     
     def get(self, request: Request, user_id: str, *args, **kwargs):
     
@@ -370,7 +410,7 @@ class StepPerHourAPIView(views.APIView):
                     refresh_cb=updateToken)
         
         # 1日の歩数データを取得
-        step_data = client.intraday_time_series('activities/steps', base_date=self.TODAY, detail_level='15min', start_time="06:00", end_time="20:00")["activities-steps-intraday"]["dataset"]
+        step_data = client.intraday_time_series('activities/steps', base_date=str(self.TODAY), detail_level='15min', start_time="06:00", end_time="20:00")["activities-steps-intraday"]["dataset"]
         # transfer DataFrame
         df_step_data = pd.DataFrame.from_dict(step_data)
         # timeにindexを貼る
@@ -440,7 +480,7 @@ class RecommendExerciseAPIView(views.APIView):
         
         # 体重を取得
         user_weight = client.make_request("https://api.fitbit.com/1/user/-/profile.json")['user']['weight'] / 2.2046
-        
+
         # 今日の残りの [METs・時] 算出
         # METs : 運動強度
         # 1MET=3.5mL/kg/分の酸素摂取量
@@ -480,3 +520,46 @@ class RecommendExerciseAPIView(views.APIView):
             return_data['time'] = -1
             
         return Response(data=return_data, status=status.HTTP_200_OK)
+    
+class FitbitWearCheckAPIView(views.APIView):
+    
+    # 今日の日付を取得
+    TODAY = datetime.date.today()
+    
+    def get(self, request: Request, user_id: str, *args, **kwargs):
+        
+        '''
+        user_idに紐付けられたuserが今日Fitbitを装着しているかを返す
+        
+        レスポンス形式
+        {
+            "wearing": bool
+        }
+        
+        '''
+        
+        # ユーザ情報の取り出し
+        client_obj = get_object_or_404(User, user_id=user_id)
+        # FitbitでClient情報を取得
+        client = fitbit.Fitbit(client_obj.client_id, client_obj.client_secret,
+                    access_token = client_obj.access_token,
+                    refresh_token = client_obj.refresh_token,
+                    refresh_cb=updateToken)
+        
+        # Get Daily Activity Summary
+        active_data = client.make_request("https://api.fitbit.com/1/user/-/activities/date/"+ str(self.TODAY) +".json")['summary']
+        print(active_data)
+        
+        wearing = False
+        
+        # active_dataに心拍の記録がなければ装着していない
+        if 'heartRateZones' in active_data:
+            wearing = True
+            
+        # response data
+        return_data = {
+            "wearing": wearing
+        }
+        
+        return Response(data=return_data, status=status.HTTP_200_OK)
+    
