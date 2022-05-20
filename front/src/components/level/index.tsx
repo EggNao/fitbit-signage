@@ -44,7 +44,7 @@ export const Level: React.VFC<LevelProps> = ({ level, rate }) => {
     },
   }
   return (
-    <div className='bg-white border rounded-lg drop-shadow-md p-5 m-2'>
+    <div className='bg-white border rounded-lg drop-shadow-md p-5 m-2 mx-0'>
       <div>
         <h1 className='not-italic p-3 text-2xl'>
           現在のレベルは&nbsp;Lv.<span className='mx-3 text-6xl'>{level}</span>です

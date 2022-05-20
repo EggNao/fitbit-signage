@@ -17,8 +17,12 @@ export const RootPage: React.VFC = () => {
 
   return (
     <div className='p-10 h-screen bg-slate-100'>
-      <h1 className='text-6xl p-4 m-2'>Good Mornig！{name}！</h1>
-      <div className='flex justify-center m-5 grid grid-cols-2'>
+      <div className='flex justify-between'>
+        <h1 className='text-6xl p-4'>Good Morning！{name}！</h1>
+        <CommentCard move={'run'} time={0} />
+      </div>
+
+      <div className='flex justify-center m-2 grid grid-cols-2'>
         <div className='grow'>
           <Level level={32} rate={2.4} />
           <LineChartCard
@@ -43,7 +47,6 @@ export const RootPage: React.VFC = () => {
               actual: [133, 311, 441, 341, 121, 451, 341, 551, 133, 451, 134, 0, 0, 0, 0, 0],
             }}
           />
-          <CommentCard move={'run'} time={0} />
         </div>
       </div>
     </div>
