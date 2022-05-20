@@ -1,3 +1,4 @@
+from ast import Return
 from django.shortcuts import render, get_object_or_404, get_list_or_404, redirect
 from django.http import Http404
 from django.http import HttpResponse
@@ -12,6 +13,7 @@ from rest_framework.response import Response
 import datetime
 import fitbit
 import pandas as pd
+import random
 
 from .models import User, DailyScore, UserGoal, UserRank
 from .serializers import UserSerializer, DailyScoreSerializer, UserGoalSerializer, UserRankSerializer
@@ -110,11 +112,11 @@ class FitbitAPIView(views.APIView):
         datetime_today = datetime.date.today()
         today_data = DailyScore.objects.filter(user=user_id, created_at__range=(datetime_today, datetime_today+datetime.timedelta(days=1))).order_by('-created_at').first()
         
-        # 歩数の取得
-        steps_daily = client.make_request("https://api.fitbit.com/1/user/-/activities/steps/date/"+ self.TODAY +"/1d/15min.json")["activities-steps"][0]["value"]
+        # 歩数とカロリーの取得
+        daily_data = client.make_request("https://api.fitbit.com/1/user/-/activities/date/"+ self.TODAY +".json")
+        steps_daily = daily_data['summary']['steps']
+        calories_daily = daily_data['summary']['caloriesOut']
         
-        # カロリーの取得
-        calories_daily = client.make_request("https://api.fitbit.com/1/user/-/activities/calories/date/"+ self.TODAY +"/1d/15min.json")["activities-calories"][0]["value"]
         
         #今日のデータの更新または作成
         if today_data:
@@ -279,7 +281,7 @@ class StampAPIView(views.APIView):
         # response data
         return_data = {
             "stamp": achieve_week,
-            "dateArray": date_week
+            "date_array": date_week
         }
       
         return Response(data=return_data, status=status.HTTP_200_OK)
@@ -331,12 +333,12 @@ class WeekDataAPIView(views.APIView):
         
         # response data
         return_data = {
-            "dataArray": {
+            "data_array": {
                 "steps": steps_week,
                 "sleep": sleep_week,
                 "calorie": calories_week,
             },
-            "dateArray": date_week
+            "date_array": date_week
         }
         
         return Response(data=return_data, status=status.HTTP_200_OK)
@@ -402,8 +404,79 @@ class StepPerHourAPIView(views.APIView):
         
     
 
+class RecommendExerciseAPIView(views.APIView):
     
-    
-    
-    
-    
+    def get(self, request: Request, user_id: str,  *args, **kwargs):
+        
+        '''
+        user_idに紐ずくユーザにおすすめの運動とその時間を返す
+        
+        レスポンス形式
+        {
+            "exercise": str
+            "time": int [分]
+        }
+        
+        '''
+        
+        # ユーザ情報の取り出し
+        client_obj = get_object_or_404(User, user_id=user_id)
+        # FitbitでClient情報を取得
+        client = fitbit.Fitbit(client_obj.client_id, client_obj.client_secret,
+                    access_token = client_obj.access_token,
+                    refresh_token = client_obj.refresh_token,
+                    refresh_cb=updateToken)
+        
+        # 今日の日付を取得
+        datetime_today = datetime.date.today()
+        
+        # 今日のカロリー消費を取得
+        user_calories_today = (DailyScore.objects.filter(user=user_id, created_at__range=(datetime_today, datetime_today+datetime.timedelta(days=1)))
+                                .order_by('-created_at').values('calories').first())['calories']
+        
+        # カロリー消費の目標値を取得
+        user_goal = (UserGoal.objects.filter(user=user_id, created_at__range=(datetime_today, datetime_today+datetime.timedelta(days=1)))
+                        .order_by('-created_at').values('calories_goal').first())['calories_goal']
+        
+        # 体重を取得
+        user_weight = client.make_request("https://api.fitbit.com/1/user/-/profile.json")['user']['weight']
+        
+        # 今日の残りの [METs・時] 算出
+        # METs : 運動強度
+        # 1MET=3.5mL/kg/分の酸素摂取量
+        mets_hour = (user_goal - user_calories_today) / user_weight
+        
+        # 各運動のMETs
+        exercise = {
+            'run': 7.0,
+            'walk': 3.0,
+            'fastwalk': 4.3,
+            'cycling': 8.0,
+            'training': 3.5
+        }
+        # 勧める運動とその時間を格納
+        recommend_exercise = dict()
+        
+        # response data
+        return_data = dict()
+        
+        # 目標を達成していない場合
+        if mets_hour > 0:
+            
+            # 各運動を行うべき時間を格納
+            for name, METs in exercise.items():
+                minutes = int(mets_hour / METs * 60)
+                if minutes < 60:
+                    #  １時間以内で勧めれる運動であれば [分] で格納
+                    recommend_exercise[name] = minutes
+            
+            # １時間以内で可能な運動からランダムに選択
+            # 最適化させたい
+            return_data['exercise'], return_data['time'] =  random.choice(list(recommend_exercise.items()))
+        
+        # 目標を達成している場合
+        else:
+            return_data['exercise'] = 'done'
+            return_data['time'] = -1
+            
+        return Response(data=return_data, status=status.HTTP_200_OK)
