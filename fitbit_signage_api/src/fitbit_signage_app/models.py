@@ -23,6 +23,7 @@ class UserRank(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
 # goals table / day
+# サイネージを見て目標値を変えようと思ったかを検証するためにuserを主キーにしない
 class UserGoal(models.Model):
     user = models.ForeignKey(User, to_field='user_id', on_delete=models.CASCADE, related_name='user_goals')
     sleep_goal = models.IntegerField()
