@@ -4,4 +4,6 @@ djangorestframework
 django-filter
 python-dotenv
 djangorestframework-camel-case
+django-cors-headers
 fitbit
+pandas
