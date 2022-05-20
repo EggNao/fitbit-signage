@@ -13,12 +13,12 @@ import { WalkChartCard } from '~/components/walkChartCard'
 import { PATH } from '~/router/path'
 
 export const RootPage: React.VFC = () => {
-  const [name, setName] = useState<string>('江口直輝')
+  const [name, setName] = useState<string>('')
 
   return (
     <div className='p-10 h-screen bg-slate-100'>
       <div className='flex justify-between'>
-        <h1 className='text-6xl p-4'>Good Morning！{name}！</h1>
+        <h1 className='text-7xl p-4'>Good Morning！{name}！</h1>
         <CommentCard move={'run'} time={0} />
       </div>
 
