@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import axios from 'axios'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-location'
 
 import { useRoot } from './hook'
@@ -14,6 +15,13 @@ import { PATH } from '~/router/path'
 
 export const RootPage: React.VFC = () => {
   const [name, setName] = useState<string>('')
+
+  useEffect(() => {
+    axios
+      .get('http://localhost:8000/fitbit/9YWMB5')
+      .then((response) => console.log(response.data))
+      .catch((error) => console.log(error))
+  }, [])
 
   return (
     <div className='p-10 h-screen bg-slate-100'>
