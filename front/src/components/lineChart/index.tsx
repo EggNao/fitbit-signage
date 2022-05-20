@@ -40,6 +40,7 @@ export const LineChart: React.VFC<LineChartProps> = ({ dataArray, dateArray, sco
           speed: 500,
         },
       },
+      height: 200,
     },
     colors: colorType[color],
     tooltip: {

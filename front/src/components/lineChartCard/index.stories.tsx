@@ -17,7 +17,6 @@ const defaultArgs: LineChartCardProps = {
   dateArray: ['20220512', '20220513', '20220514', '20220515', '20220516', '20220517', '20220518'],
   scoreType: 'steps',
   color: 'purple',
-  text: 'Steps',
 }
 
 export const Default = Template.bind({})

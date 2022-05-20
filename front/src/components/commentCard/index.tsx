@@ -15,14 +15,15 @@ export const CommentCard: React.VFC<commentCardProps> = ({ move, time }) => {
     done: '',
   }
   return (
-    <div className='border rounded drop-shadow-md'>
-      <h1 className='underline underline-offset-8 m-4 mb-8 text-2xl'>運動のススメ</h1>
-      <h1 className='text-2xl m-5'>
-        あなたは
-        <br />
-        <span className='text-2xl'>{moveType[move]}&nbsp;</span>を&nbsp;<span className='text-6xl'>{time}&nbsp;</span>分
-        することで今日の目標を達成できます！
-      </h1>
+    <div className='bg-white border rounded-lg drop-shadow-md m-2'>
+      <div className='m-2'>
+        <h1 className='underline underline-offset-8 m-4 mb-2 pt-3 pr-3 pb-1 text-2xl'>Recommend</h1>
+        <h1 className='text-base mt-2 mb-4 ml-4'>
+          あなたは
+          <span className='text-xl'>{moveType[move]}&nbsp;</span>を&nbsp;<span className='text-4xl'>{time}&nbsp;</span>
+          分 することで 今日の目標を達成できます！
+        </h1>
+      </div>
     </div>
   )
 }

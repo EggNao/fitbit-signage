@@ -37,7 +37,7 @@ export const WalkChart: React.VFC<WalkChartProps> = ({ stepsArray }) => {
         columnWidth: '60%',
       },
     },
-    colors: ['#00E396'],
+    colors: ['#05CD99'],
     dataLabels: {
       enabled: false,
     },
@@ -46,7 +46,7 @@ export const WalkChart: React.VFC<WalkChartProps> = ({ stepsArray }) => {
       showForSingleSeries: true,
       customLegendItems: ['Actual', 'Expected'],
       markers: {
-        fillColors: ['#00E396', '#775DD0'],
+        fillColors: ['#05CD99', '#775DD0'],
       },
     },
   }

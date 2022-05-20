@@ -5,12 +5,11 @@ export type LineChartCardProps = {
   dateArray: string[]
   scoreType: 'steps' | 'sleep' | 'calorie'
   color: 'green' | 'red' | 'orenge' | 'blue' | 'lightblue' | 'yellow' | 'purple'
-  text: string
 }
 
-export const LineChartCard: React.VFC<LineChartCardProps> = ({ dataArray, dateArray, scoreType, color, text }) => {
+export const LineChartCard: React.VFC<LineChartCardProps> = ({ dataArray, dateArray, scoreType, color }) => {
   return (
-    <div className='border rounded drop-shadow-md p-10 m-2'>
+    <div className='border rounded-lg drop-shadow-md p-6 m-2 bg-white'>
       <span className='text-3xl'>{scoreType}</span>
       <LineChart dataArray={dataArray} dateArray={dateArray} scoreType={scoreType} color={color} />
     </div>
