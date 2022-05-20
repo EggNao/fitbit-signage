@@ -128,11 +128,15 @@ class FitbitAPIView(views.APIView):
             
         else: # 今日まだ取得していない場合
             # 睡眠データ取得
-            sleep_data = client.make_request("https://api.fitbit.com/1.2/user/-/sleep/date/"+ self.TODAY +".json")['sleep'][0]
-            # 睡眠効率を取得
-            sleep_efficiency = sleep_data['efficiency']
-            # 睡眠時間を取得
-            sleep_mitutes = sleep_data['minutesAsleep']
+            sleep_data = client.make_request("https://api.fitbit.com/1.2/user/-/sleep/date/"+ self.TODAY +".json")['sleep']
+            if sleep_data:
+                # 睡眠効率を取得
+                sleep_efficiency = sleep_data['efficiency']
+                # 睡眠時間を取得
+                sleep_mitutes = sleep_data['minutesAsleep']
+            else:
+                sleep_efficiency = 0
+                sleep_mitutes = 0
             
             serializer = self.serializer_class(data={"user": user_id, "sleep_score": sleep_efficiency, 'sleep_minutes': sleep_mitutes, "steps": steps_daily, "calories": calories_daily})
             serializer.is_valid(raise_exception=True)
