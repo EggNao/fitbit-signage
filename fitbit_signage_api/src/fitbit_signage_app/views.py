@@ -527,7 +527,7 @@ class RecommendExerciseAPIView(views.APIView):
                         .order_by('-created_at').values('calories_goal').first())['calories_goal']
         
         # 体重を取得
-        user_weight = 62 #client.make_request("https://api.fitbit.com/1/user/-/profile.json")['user']['weight'] / 2.2046
+        user_weight = client.make_request("https://api.fitbit.com/1/user/-/profile.json")['user']['weight'] / 2.2046
 
         # 今日の残りの [METs・時] 算出
         # METs : 運動強度
