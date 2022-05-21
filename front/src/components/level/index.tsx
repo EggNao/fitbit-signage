@@ -47,7 +47,7 @@ export const Level: React.VFC<LevelProps> = ({ level, rate }) => {
     <div className='bg-white border rounded-lg drop-shadow-md p-5 m-2 h-90'>
       <div className='w-full'>
         <h1 className='not-italic p-6 text-4xl'>
-          現在のレベルは&nbsp;Lv.<span className='mx-3 text-8xl'>{level}</span>です
+          現在のレベルは&nbsp;Lv.<span className='mx-3 text-8xl'>{level + intRate}</span>です
         </h1>
         <Chart options={options} series={series} type='bar' height='150' />
       </div>
