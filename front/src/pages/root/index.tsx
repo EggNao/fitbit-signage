@@ -44,7 +44,7 @@ export const RootPage: React.VFC = () => {
         .then((response) => console.log('fitbit/stamp', response.data))
         .catch((error) => console.log(error))
       await axios
-        .get('http://localhost:8000/fitbit/steps/9YHK8W')
+        .get('http://localhost:8000/fitbit/steps/9YWMB5')
         .then((response) => console.log('fitbit/steps', response.data))
         .catch((error) => console.log(error))
     }
