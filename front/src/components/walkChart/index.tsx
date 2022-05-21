@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import Chart from 'react-apexcharts'
 
-export type Walk = 'goal' | 'Actual'
+export type Walk = 'goals' | 'steps'
 
 export type WalkChartProps = { stepsArray: { [s: string]: number[] } }
 
@@ -10,11 +10,11 @@ export const WalkChart: React.VFC<WalkChartProps> = ({ stepsArray }) => {
   for (let i = 0; i < 15; i++) {
     dataArray.push({
       x: String(6 + i),
-      y: stepsArray['actual'][i],
+      y: stepsArray['steps'][i],
       goals: [
         {
           name: 'Expected',
-          value: stepsArray['goal'][i],
+          value: stepsArray['goals'][i],
           strokeHeight: 5,
           strokeColor: '#775DD0',
         },
@@ -48,10 +48,27 @@ export const WalkChart: React.VFC<WalkChartProps> = ({ stepsArray }) => {
       markers: {
         fillColors: ['#05CD99', '#775DD0'],
       },
+      fontSize: '22px',
+    },
+    xaxis: {
+      // title: { text: scoreType },
+      labels: {
+        style: {
+          fontSize: '22px',
+        },
+      },
+    },
+    yaxis: {
+      // title: { text: scoreType },
+      labels: {
+        style: {
+          fontSize: '22px',
+        },
+      },
     },
   }
   return (
-    <div>
+    <div className='m-2'>
       <Chart options={options} series={series} type='bar'></Chart>
     </div>
   )

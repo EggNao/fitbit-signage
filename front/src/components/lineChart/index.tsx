@@ -50,13 +50,23 @@ export const LineChart: React.VFC<LineChartProps> = ({ dataArray, dateArray, sco
     },
     xaxis: {
       categories: formatDateArray,
+      labels: {
+        style: {
+          fontSize: '18px',
+        },
+      },
     },
     yaxis: {
-      title: { text: scoreType },
+      // title: { text: scoreType },
+      labels: {
+        style: {
+          fontSize: '22px',
+        },
+      },
     },
   }
   return (
-    <div>
+    <div className='m-2'>
       <Chart type='line' options={options} series={dataList[scoreType]} />
     </div>
   )

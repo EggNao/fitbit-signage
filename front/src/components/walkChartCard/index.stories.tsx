@@ -10,8 +10,8 @@ export default {
 const Template: ComponentStory<typeof WalkChartCard> = (args) => <WalkChartCard {...args} />
 const defaultArgs: WalkChartCardProps = {
   stepsArray: {
-    goal: [123, 342, 455, 344, 544, 325, 154, 365, 344, 423, 212, 223, 312, 432, 212],
-    actual: [133, 311, 441, 341, 121, 451, 341, 551, 133, 451, 134, 0, 0, 0, 0, 0],
+    goals: [123, 342, 455, 344, 544, 325, 154, 365, 344, 423, 212, 223, 312, 432, 212],
+    steps: [133, 311, 441, 341, 121, 451, 341, 551, 133, 451, 134, 0, 0, 0, 0, 0],
   },
 }
 

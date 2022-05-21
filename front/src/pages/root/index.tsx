@@ -11,18 +11,73 @@ import { RadialBarChartCard } from '~/components/radialBarChartCard'
 import { WalkChartCard } from '~/components/walkChartCard'
 import { PATH } from '~/router/path'
 
+export type TodayMoveDataType = {
+  calorie: number[]
+  sleep: number[]
+  steps: number[]
+}
+
+export type GoalsType = {
+  calorie: number
+  sleep: number
+  steps: number
+}
+
+export type RankType = {
+  level: number
+  rate: number
+}
+
+export type WeekMoveDataType = {
+  dataArray: {
+    steps: number[]
+    sleep: number[]
+    calorie: number[]
+  }
+  dateArray: string[]
+}
+
+export type StampType = {
+  dateArray: string[]
+  stamp: boolean[]
+}
+
+export type TodayStepsType = {
+  goals: number[]
+  steps: number[]
+}
+
+export type RecommendType = {
+  exercise: 'run' | 'fastwalk' | 'cycling' | 'training' | 'walk' | 'done'
+  time: number
+}
+
 export const RootPage: React.VFC = () => {
-  // const [name, setName] = useState<string>('江口さん')
-  // const [todayMoveData, setTodayMoveData] = useState()
-  // const [goals, setGoals] = useState()
-  // const [rank, setRank] = useState()
-  // const [weekMoveData, setWeekMoveData] = useState()
-  // const [stamp, setStamp] = useState()
-  // const [todaySteps, setTodaySteps] = useState()
+  const [name, setName] = useState<string>('江口直輝さん')
+
+  const [todayMoveData, setTodayMoveData] = useState<TodayMoveDataType>({ calorie: [0], sleep: [0], steps: [0] })
+  const [goals, setGoals] = useState<GoalsType>({ calorie: 0, sleep: 0, steps: 0 })
+  const [rank, setRank] = useState<RankType>({ level: 1, rate: 2.3 })
+  const [weekMoveData, setWeekMoveData] = useState<WeekMoveDataType>({
+    dataArray: {
+      steps: [0, 0, 0, 0, 0, 0, 0],
+      sleep: [0, 0, 0, 0, 0, 0, 0],
+      calorie: [0, 0, 0, 0, 0, 0, 0],
+    },
+    dateArray: ['0', '1', '2', '3', '4', '5', '6'],
+  })
+  const [stamp, setStamp] = useState<StampType>({
+    dateArray: ['0', '1', '2', '3', '4', '5', '6'],
+    stamp: [false, false, false, false, false, false, false],
+  })
+  const [todaySteps, setTodaySteps] = useState<TodayStepsType>({
+    goals: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    steps: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  })
+  const [recommend, setRecommend] = useState<RecommendType>({ exercise: 'run', time: 30 })
 
   useEffect(() => {
     const fetchData = async () => {
-      console.log('aaa')
       await axios
         .get('http://localhost:8000/fitbit/9YWMB5')
         .then((response) => console.log('fitbit', response.data))
@@ -47,43 +102,36 @@ export const RootPage: React.VFC = () => {
         .get('http://localhost:8000/fitbit/steps/9YWMB5')
         .then((response) => console.log('fitbit/steps', response.data))
         .catch((error) => console.log(error))
+      await axios
+        .get('http://localhost:8000/fitbit/exercise/9YWMB5')
+        .then((response) => console.log('fitbit/exercise', response.data))
+        .catch((error) => console.log(error))
     }
     fetchData()
   }, [])
 
   return (
-    <div className='p-10 h-screen bg-slate-100'>
+    <div className='p-2 h-screen bg-slate-100'>
       <div className='flex justify-between'>
-        <h1 className='text-7xl p-4'>Good Morning！{name}！</h1>
-        <CommentCard move={'run'} time={0} />
+        <h1 className='text-7xl p-8'>Good Morning！{name}！</h1>
+        <CommentCard move={recommend.exercise} time={recommend.time} />
       </div>
 
-      <div className='flex justify-center m-2 grid grid-cols-2'>
-        <div className='grow'>
-          <Level level={32} rate={2.4} />
-          <LineChartCard
-            dataArray={{
-              steps: [3245, 2423, 2353, 5647, 6756, 3464, 6325],
-              sleep: [87, 67, 78, 98, 76, 77, 68],
-              calorie: [2345, 3023, 2653, 5647, 2256, 1864, 2725],
-            }}
-            dateArray={['20220512', '20220513', '20220514', '20220515', '20220516', '20220517', '20220518']}
-            scoreType={'steps'}
-            color={'green'}
-          />
-        </div>
-        <div className='grow justify-center'>
-          <RadialBarChartCard
-            goal={{ steps: 8000, calorie: 3000, sleep: 360 }}
-            value={{ steps: 4738, calorie: 2391, sleep: 480 }}
-          />
-          <WalkChartCard
-            stepsArray={{
-              goal: [123, 342, 455, 344, 544, 325, 154, 365, 344, 423, 212, 223, 312, 432, 212],
-              actual: [133, 311, 441, 341, 121, 451, 341, 551, 133, 451, 134, 0, 0, 0, 0, 0],
-            }}
-          />
-        </div>
+      <div className='flex grid grid-cols-2'>
+        <Level level={rank.level} rate={rank.rate} />
+        <RadialBarChartCard
+          goal={{ steps: 8000, calorie: 3000, sleep: 360 }}
+          value={{ steps: 4738, calorie: 2391, sleep: 480 }}
+        />
+      </div>
+      <div className='flex grid grid-cols-2'>
+        <LineChartCard
+          dataArray={weekMoveData.dataArray}
+          dateArray={weekMoveData.dateArray}
+          scoreType={'steps'}
+          color={'green'}
+        />
+        <WalkChartCard stepsArray={todaySteps} />
       </div>
     </div>
   )

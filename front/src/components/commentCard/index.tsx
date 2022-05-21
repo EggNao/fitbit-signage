@@ -15,7 +15,7 @@ export const CommentCard: React.VFC<commentCardProps> = ({ move, time }) => {
     done: '',
   }
   return (
-    <div className='bg-white border rounded-lg drop-shadow-md m-4 p-4'>
+    <div className='bg-white border rounded-lg drop-shadow-md m-2 p-4'>
       <h1 className='underline underline-offset-8 m-2 pt-2 pr-3 pb-1 text-4xl'>Recommend</h1>
       <h1 className='text-base mt-2 mb-4 ml-4 text-2xl'>
         あなたは
