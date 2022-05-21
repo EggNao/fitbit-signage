@@ -306,7 +306,7 @@ class StampAPIView(views.APIView):
         date_week = list()
         
         # 過去７日間の日付
-        date_range = [datetime_today - datetime.timedelta(days=i) for i in range(0, 7)]
+        date_range = [datetime_today - datetime.timedelta(days=i) for i in range(0, 7)].sort()
         
         # １週間のデータを取得
         for date in date_range:
@@ -353,7 +353,7 @@ class WeekDataAPIView(views.APIView):
         # 今日の日付を取得
         datetime_today = datetime.date.today()
         # 過去７日間の日付
-        date_range = [datetime_today - datetime.timedelta(days=i) for i in range(0, 7)]
+        date_range = [datetime_today - datetime.timedelta(days=i) for i in range(0, 7)].sort()
         
         # １週間のデータを取得
         for date in date_range:
