@@ -138,7 +138,7 @@ class FitbitAPIView(views.APIView):
                 sleep_efficiency = 0
                 sleep_minutes = 0
             
-            serializer = self.serializer_class(data={"user": user_id, "sleep_score": sleep_efficiency, 'sleep_minutes': sleep_mitutes, "steps": steps_daily, "calories": calories_daily})
+            serializer = self.serializer_class(data={"user": user_id, "sleep_score": sleep_efficiency, 'sleep_minutes': sleep_minutes, "steps": steps_daily, "calories": calories_daily})
             serializer.is_valid(raise_exception=True)
             serializer.save()
 
@@ -203,7 +203,7 @@ class RankAPIView(views.APIView):
     def get(self, request: Request, user_id: str, *args, **kwargs):
         
         '''
-        user_idに紐ずくユーザの目標の達成率に応じてランクを更新し，ランクを返す
+        user_idに紐ずくユーザのランクと経験値を返す
         
         レスポンス形式
         {
@@ -242,19 +242,15 @@ class RankAPIView(views.APIView):
         is_calories = user_rank.is_calories
         
         if rate_sleep >= 1 and not is_sleep:
-            rank += 1
             is_sleep = True
             
         if rate_steps >= 1 and not is_steps:
-            rank += 1
             is_steps = True
         
         if rate_calories >= 1 and not is_calories:
-            rank += 1
             is_calories = True
         
         data = {
-            'rank': rank,
             'is_sleep': is_sleep,
             'is_steps': is_steps,
             'is_calories': is_calories,
@@ -273,6 +269,8 @@ class RankAPIView(views.APIView):
         }
       
         return Response(data=return_data, status=status.HTTP_200_OK)
+
+
     
 class StampAPIView(views.APIView):
     
@@ -306,7 +304,7 @@ class StampAPIView(views.APIView):
         date_week = list()
         
         # 過去７日間の日付
-        date_range = [datetime_today - datetime.timedelta(days=i) for i in range(0, 7)].sort()
+        date_range = sorted([datetime_today - datetime.timedelta(days=i) for i in range(0, 7)])
         
         # １週間のデータを取得
         for date in date_range:
@@ -529,7 +527,7 @@ class RecommendExerciseAPIView(views.APIView):
                         .order_by('-created_at').values('calories_goal').first())['calories_goal']
         
         # 体重を取得
-        user_weight = client.make_request("https://api.fitbit.com/1/user/-/profile.json")['user']['weight'] / 2.2046
+        user_weight = 62 #client.make_request("https://api.fitbit.com/1/user/-/profile.json")['user']['weight'] / 2.2046
 
         # 今日の残りの [METs・時] 算出
         # METs : 運動強度
@@ -542,7 +540,7 @@ class RecommendExerciseAPIView(views.APIView):
             'walk': 3.0,
             'fastwalk': 4.3,
             'cycling': 8.0,
-            'training': 3.5
+            'training': 3.5,
         }
         # 勧める運動とその時間を格納
         recommend_exercise = dict()
@@ -562,8 +560,12 @@ class RecommendExerciseAPIView(views.APIView):
             
             # １時間以内で可能な運動からランダムに選択
             # 最適化させたい
-            return_data['exercise'], return_data['time'] =  random.choice(list(recommend_exercise.items()))
-        
+            if len(recommend_exercise.items()):
+                return_data['exercise'], return_data['time'] =  random.choice(list(recommend_exercise.items()))
+            else:
+                return_data['exercise'] = 'cycling'
+                return_data['time'] = int(mets_hour / exercise['cycling'] * 60)
+
         # 目標を達成している場合
         else:
             return_data['exercise'] = 'done'
