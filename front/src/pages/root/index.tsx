@@ -12,9 +12,9 @@ import { WalkChartCard } from '~/components/walkChartCard'
 import { PATH } from '~/router/path'
 
 export type TodayMoveDataType = {
-  calorie: number[]
-  sleep: number[]
-  steps: number[]
+  calorie: number
+  sleep: number
+  steps: number
 }
 
 export type GoalsType = {
@@ -55,7 +55,7 @@ export type RecommendType = {
 export const RootPage: React.VFC = () => {
   const [name, setName] = useState<string>('江口直輝さん')
 
-  const [todayMoveData, setTodayMoveData] = useState<TodayMoveDataType>({ calorie: [0], sleep: [0], steps: [0] })
+  const [todayMoveData, setTodayMoveData] = useState<TodayMoveDataType>({ calorie: 0, sleep: 0, steps: 0 })
   const [goals, setGoals] = useState<GoalsType>({ calorie: 0, sleep: 0, steps: 0 })
   const [rank, setRank] = useState<RankType>({ level: 1, rate: 2.3 })
   const [weekMoveData, setWeekMoveData] = useState<WeekMoveDataType>({
@@ -79,32 +79,53 @@ export const RootPage: React.VFC = () => {
   useEffect(() => {
     const fetchData = async () => {
       await axios
-        .get('http://localhost:8000/fitbit/9YWMB5')
-        .then((response) => console.log('fitbit', response.data))
+        .get('http://localhost:8000/fitbit/9YHK8W')
+        .then((response) => {
+          console.log('fitbit', response.data)
+          setTodayMoveData(response.data)
+        })
         .catch((error) => console.log(error))
       await axios
-        .get('http://localhost:8000/fitbit/goals/9YWMB5')
-        .then((response) => console.log('fitbit/goals', response.data))
+        .get('http://localhost:8000/fitbit/goals/9YHK8W')
+        .then((response) => {
+          console.log('fitbit/goals', response.data)
+          setGoals(response.data)
+        })
         .catch((error) => console.log(error))
       await axios
-        .get('http://localhost:8000/week/rank/9YWMB5')
-        .then((response) => console.log('fitbit/week/rank', response.data))
+        .get('http://localhost:8000/week/rank/9YHK8W')
+        .then((response) => {
+          console.log('fitbit/week/rank', response.data)
+          setRank(response.data)
+        })
         .catch((error) => console.log(error))
       await axios
-        .get('http://localhost:8000/week/9YWMB5')
-        .then((response) => console.log('fitbit/week', response.data))
+        .get('http://localhost:8000/week/9YHK8W')
+        .then((response) => {
+          console.log('fitbit/week', response.data)
+          setWeekMoveData(response.data)
+        })
         .catch((error) => console.log(error))
       await axios
-        .get('http://localhost:8000/week/stamp/9YWMB5')
-        .then((response) => console.log('fitbit/stamp', response.data))
+        .get('http://localhost:8000/week/stamp/9YHK8W')
+        .then((response) => {
+          console.log('fitbit/stamp', response.data)
+          setStamp(response.data)
+        })
         .catch((error) => console.log(error))
       await axios
-        .get('http://localhost:8000/fitbit/steps/9YWMB5')
-        .then((response) => console.log('fitbit/steps', response.data))
+        .get('http://localhost:8000/fitbit/steps/9YHK8W')
+        .then((response) => {
+          console.log('fitbit/steps', response.data)
+          setTodaySteps(response.data)
+        })
         .catch((error) => console.log(error))
       await axios
-        .get('http://localhost:8000/fitbit/exercise/9YWMB5')
-        .then((response) => console.log('fitbit/exercise', response.data))
+        .get('http://localhost:8000/fitbit/exercise/9YHK8W')
+        .then((response) => {
+          console.log('fitbit/exercise', response.data)
+          setRecommend(response.data)
+        })
         .catch((error) => console.log(error))
     }
     fetchData()
@@ -119,10 +140,7 @@ export const RootPage: React.VFC = () => {
 
       <div className='flex grid grid-cols-2'>
         <Level level={rank.level} rate={rank.rate} />
-        <RadialBarChartCard
-          goal={{ steps: 8000, calorie: 3000, sleep: 360 }}
-          value={{ steps: 4738, calorie: 2391, sleep: 480 }}
-        />
+        <RadialBarChartCard goal={goals} value={todayMoveData} />
       </div>
       <div className='flex grid grid-cols-2'>
         <LineChartCard
