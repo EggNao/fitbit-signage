@@ -9,8 +9,8 @@ export type LineChartCardProps = {
 
 export const LineChartCard: React.VFC<LineChartCardProps> = ({ dataArray, dateArray, scoreType, color }) => {
   return (
-    <div className='border rounded-lg drop-shadow-md p-6 m-2 mx-0 bg-white'>
-      <span className='text-3xl'>{scoreType}</span>
+    <div className='border rounded-lg drop-shadow-md p-6 m-2 bg-white'>
+      <span className='text-4xl'>{scoreType}</span>
       <LineChart dataArray={dataArray} dateArray={dateArray} scoreType={scoreType} color={color} />
     </div>
   )

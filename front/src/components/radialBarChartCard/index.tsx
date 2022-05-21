@@ -7,7 +7,7 @@ export type RadialBarChartCardProps = {
 
 export const RadialBarChartCard: React.VFC<RadialBarChartCardProps> = ({ goal, value }) => {
   return (
-    <div className='bg-white border rounded-lg drop-shadow-md p-2 m-2 flex justify-center'>
+    <div className='bg-white border rounded-lg drop-shadow-md p-2 m-2 flex justify-center h-88'>
       <div className='w-1/3'>
         <RadialBarChart goal={goal} value={value} scoreType={'steps'} color={'green'} />
       </div>
