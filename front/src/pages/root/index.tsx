@@ -71,7 +71,7 @@ export const RootPage: React.VFC = () => {
     stamp: [false, false, false, false, false, false, false],
   })
   const [todaySteps, setTodaySteps] = useState<TodayStepsType>({
-    goals: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    goals: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     steps: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   })
   const [recommend, setRecommend] = useState<RecommendType>({ exercise: 'run', time: 30 })
