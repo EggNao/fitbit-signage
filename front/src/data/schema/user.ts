@@ -20,14 +20,14 @@ const usersConverter: FirestoreDataConverter<UserDocument> = {
   fromFirestore(snapshot: QueryDocumentSnapshot): UserDocument {
     const data = snapshot.data()
     return {
-      acsessToken: data.acsessToken,
-      clientId: data.clientId,
-      clientSecret: data.clientSecret,
-      macAddress: data.macAddress,
-      name: data.name,
-      refreshToken: data.refreshToken,
-      userId: data.userId,
-      createdAt: data.createdAt,
+      acsessToken: data.acsessToken ?? '',
+      clientId: data.clientId ?? '',
+      clientSecret: data.clientSecret ?? '',
+      macAddress: data.macAddress ?? '',
+      name: data.name ?? '',
+      refreshToken: data.refreshToken ?? '',
+      userId: data.userId ?? '',
+      createdAt: data.createdAt.toDate(),
     }
   },
 }
