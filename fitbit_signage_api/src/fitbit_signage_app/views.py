@@ -353,7 +353,7 @@ class WeekDataAPIView(views.APIView):
         # 今日の日付を取得
         datetime_today = datetime.date.today()
         # 過去７日間の日付
-        date_range = [datetime_today - datetime.timedelta(days=i) for i in range(0, 7)].sort()
+        date_range = sorted([datetime_today - datetime.timedelta(days=i) for i in range(0, 7)])
         
         # １週間のデータを取得
         for date in date_range:
@@ -420,7 +420,7 @@ class StepPerHourAPIView(views.APIView):
         #### 過去のデータ #####
         
         # 過去７日間の日付
-        date_range = [self.TODAY - datetime.timedelta(days=i) for i in range(1, 7)]
+        date_range = sorted([self.TODAY - datetime.timedelta(days=i) for i in range(1, 7)])
         
         # 過去１週間のデータを取得
         for date in date_range:
