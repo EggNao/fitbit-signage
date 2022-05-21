@@ -119,7 +119,7 @@ class FitbitAPIView(views.APIView):
         #今日のデータの更新または作成
         if today_data:
             sleep_efficiency = today_data.sleep_score
-            sleep_mitutes = today_data.sleep_minutes
+            sleep_minutes = today_data.sleep_minutes
             
             # 今日のデータの更新
             serializer = self.serializer_class(instance=today_data, data={"steps": steps_daily, "calories": calories_daily}, partial=True)
@@ -133,10 +133,10 @@ class FitbitAPIView(views.APIView):
                 # 睡眠効率を取得
                 sleep_efficiency = sleep_data['efficiency']
                 # 睡眠時間を取得
-                sleep_mitutes = sleep_data['minutesAsleep']
+                sleep_minutes = sleep_data['minutesAsleep']
             else:
                 sleep_efficiency = 0
-                sleep_mitutes = 0
+                sleep_minutes = 0
             
             serializer = self.serializer_class(data={"user": user_id, "sleep_score": sleep_efficiency, 'sleep_minutes': sleep_mitutes, "steps": steps_daily, "calories": calories_daily})
             serializer.is_valid(raise_exception=True)
@@ -145,9 +145,9 @@ class FitbitAPIView(views.APIView):
         
         # response data
         return_data = {
-            'steps': [int(steps_daily)],
-            'calorie': [int(calories_daily)],
-            'sleep': [sleep_mitutes]
+            'steps': int(steps_daily),
+            'calorie': int(calories_daily),
+            'sleep': sleep_minutes
         }
         
         return Response(data=return_data, status=status.HTTP_200_OK)
