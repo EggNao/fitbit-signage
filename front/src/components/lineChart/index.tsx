@@ -30,7 +30,7 @@ export const LineChart: React.VFC<LineChartProps> = ({ dataArray, dateArray, sco
   }
 
   const formatDateArray = dateArray.map((data) => {
-    return dayjs(data).format('YYYY/MM/DD')
+    return dayjs(data).format('MM/DD')
   })
 
   const options = {
@@ -45,7 +45,7 @@ export const LineChart: React.VFC<LineChartProps> = ({ dataArray, dateArray, sco
     colors: colorType[color],
     tooltip: {
       x: {
-        format: 'YYYY/MM/DD',
+        format: 'MM/DD',
       },
     },
     xaxis: {
