@@ -25,7 +25,7 @@ obniz.onconnect = async function() {
 
     const setting = {
         duration: 15, // スキャン時間
-        duplicate: false // 同一デバイスでも再表示
+        duplicate: true // 同一デバイスでも再表示
     };
 
     await obniz.ble.initWait();
@@ -46,9 +46,9 @@ obniz.onconnect = async function() {
   
     obniz.ble.scan.onfinish = async function(peripherals, error){
       console.log("scan again")
-    //   await obniz.ble.scan.startWait();
+      await obniz.ble.scan.startWait(target, setting);
     };
-  setInterval(async() => {
+//   setInterval(async() => {
     await obniz.ble.scan.startWait(target, setting);
-  }, 18000)
+//   }, 18000)
 }
