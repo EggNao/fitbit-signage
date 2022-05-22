@@ -244,7 +244,7 @@ export const RootPage: React.VFC = () => {
           </div>
         </div>
       )}
-      {isShow === false && <img src={Home} alt='' />}
+      {isShow === false && <img src={Home} alt='' className='h-screen' />}
     </div>
   )
 }
