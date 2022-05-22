@@ -128,7 +128,7 @@ class FitbitAPIView(views.APIView):
             
         else: # 今日まだ取得していない場合
             # 睡眠データ取得
-            sleep_data = client.make_request("https://api.fitbit.com/1.2/user/-/sleep/date/"+ str(self.TODAY) +".json")['sleep']
+            sleep_data = client.make_request("https://api.fitbit.com/1.2/user/-/sleep/date/"+ str(self.TODAY) +".json")['sleep'][0]
             if sleep_data:
                 # 睡眠効率を取得
                 sleep_efficiency = sleep_data['efficiency']
