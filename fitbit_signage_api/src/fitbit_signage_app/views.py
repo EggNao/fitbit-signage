@@ -84,17 +84,91 @@ class DailyAPIView(views.APIView):
     # 今日の日付を取得
     TODAY = datetime.date.today()
     
+    def post(self, request: Request, *args, **kwargs):
+        
+        '''
+        cronで日付が更新されたタイミングで全員分のDailyScoreを作成
+        
+        レスポンス形式
+        
+        Userごとに
+        {   
+            "user_id": str
+            "steps'": int,
+	        "calories": int,
+            "sleep_score": int, 
+            "sleep_minutes": int, 
+        }
+        
+        '''
+        
+        user_all = User.objects.all()
+        
+         # response data
+        return_data = list()
+        
+        # 全ユーザの今日の記録を更新
+        for user in user_all:
+            print(user.user_id)
+            # FitbitでClient情報を取得
+            client = fitbit.Fitbit(user.client_id, user.client_secret,
+                        access_token = user.access_token,
+                        refresh_token = user.refresh_token,
+                        refresh_cb=updateToken)
+            
+            # 歩数とカロリーの取得
+            daily_data = client.make_request("https://api.fitbit.com/1/user/-/activities/date/"+ str(self.TODAY) +".json")
+            steps_daily = daily_data['summary']['steps']
+            calories_daily = daily_data['summary']['caloriesOut']
+            
+    
+            today_data = DailyScore.objects.filter(user=user.user_id, created_at__range=(self.TODAY, self.TODAY+datetime.timedelta(days=1))).order_by('-created_at').first()
+            
+            sleep_data = client.make_request("https://api.fitbit.com/1.2/user/-/sleep/date/"+ str(self.TODAY) +".json")['sleep']
+            if sleep_data:
+                # 睡眠効率を取得
+                sleep_efficiency = sleep_data[0]['efficiency']
+                # 睡眠時間を取得
+                sleep_minutes = sleep_data[0]['minutesAsleep']
+            else:
+                sleep_efficiency = 0
+                sleep_minutes = 0
+            
+            
+            # 今日のデータの更新
+            data_daily = { "user": user.user_id, "sleep_score": sleep_efficiency, 'sleep_minutes': sleep_minutes, "steps": steps_daily, "calories": calories_daily }
+            serializer = self.serializer_class(data=data_daily)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            
+            
+            return_data.append({
+                "user": user.user_id, 
+                "sleep_score": sleep_efficiency, 
+                'sleep_minutes': sleep_minutes, 
+                "steps": steps_daily, 
+                "calories": calories_daily
+            })
+            
+        
+        return Response(data=return_data, status=status.HTTP_200_OK)
+    
     def patch(self, request: Request, *args, **kwargs):
         
         '''
         cronで5分ごとにに全員分のDailyScoreを更新する
         
         レスポンス形式
-        {
-            'steps': [int],
-	        'calories': [int],
-	        'sleep': [int]
+        
+        Userごとに
+        {   
+            "user_id": str
+            "steps'": int,
+	        "calories": int,
+            "sleep_score": int, 
+            "sleep_minutes": int, 
         }
+        
         '''
         
         user_all = User.objects.all()
@@ -146,6 +220,7 @@ class DailyAPIView(views.APIView):
             
         
         return Response(data=return_data, status=status.HTTP_200_OK)
+
 
 class FitbitAPIView(views.APIView):
     
@@ -221,48 +296,6 @@ class FitbitAPIView(views.APIView):
         
         return Response(data=return_data, status=status.HTTP_200_OK)
     
-    
-    def patch(self, request: Request, *args, **kwargs):
-        
-        '''
-        日付が更新時に全員分のDailyScoreを更新する
-        
-        レスポンス形式
-        
-        (成功時)
-        {
-            result: "success"
-        }
-        '''
-        
-        user_all = User.objects.all()
-        
-        # 全ユーザの今日の記録を更新
-        for user in user_all:
-            print(user.user_id)
-            # FitbitでClient情報を取得
-            client = fitbit.Fitbit(user.client_id, user.client_secret,
-                        access_token = user.access_token,
-                        refresh_token = user.refresh_token,
-                        refresh_cb=updateToken)
-            
-            # 歩数とカロリーの取得
-            daily_data = client.make_request("https://api.fitbit.com/1/user/-/activities/date/"+ str(self.TODAY) +".json")
-            steps_daily = daily_data['summary']['steps']
-            calories_daily = daily_data['summary']['caloriesOut']
-            
-    
-            today_data = DailyScore.objects.filter(user=user.user_id, created_at__range=(self.TODAY, self.TODAY+datetime.timedelta(days=1))).order_by('-created_at').first()
-            
-            
-            # 今日のデータの更新
-            serializer = self.serializer_class(instance=today_data, data={"steps": steps_daily, "calories": calories_daily}, partial=True)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            
-            
-        return Response(data={'result': 'success'}, status=status.HTTP_200_OK)
-        
     
     
 class RankAPIView(views.APIView):
