@@ -3,7 +3,7 @@ from fitbit_signage_app import views
 from django.conf.urls import url
 
 urlpatterns = [
-    path('', views.FitbitAPIView.as_view()),
+    path('', views.DailyAPIView.as_view()),
     path('<str:user_id>', views.FitbitAPIView.as_view()),
     path('goals/<str:user_id>', views.GoalsAPIView.as_view()),
     path('steps/<str:user_id>', views.StepPerHourAPIView.as_view()),
