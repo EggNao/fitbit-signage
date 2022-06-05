@@ -1,3 +1,4 @@
+from email.policy import default
 from statistics import mode
 from django.db import models
 
@@ -16,6 +17,7 @@ class User(models.Model):
 class UserRank(models.Model):
     user = models.ForeignKey(User, to_field='user_id', on_delete=models.CASCADE, related_name='user_rank', primary_key=True)
     rank = models.IntegerField(default=1)
+    rate = models.FloatField(default=0)
     is_sleep = models.BooleanField(default=False)
     is_steps = models.BooleanField(default=False)
     is_calories = models.BooleanField(default=False)

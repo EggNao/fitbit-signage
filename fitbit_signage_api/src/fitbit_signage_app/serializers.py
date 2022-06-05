@@ -18,7 +18,7 @@ class UserRankSerializer(serializers.ModelSerializer):
     "UserRank Class Serializer"
     class Meta:
         model = UserRank
-        fields = ('user', 'rank', 'is_sleep', 'is_steps', 'is_calories')
+        fields = ('user', 'rank', 'rate', 'is_sleep', 'is_steps', 'is_calories')
 
         
 class UserGoalSerializer(serializers.ModelSerializer):

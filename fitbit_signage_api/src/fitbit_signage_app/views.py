@@ -278,7 +278,62 @@ class DailyAPIView(views.APIView):
     
 class RankAPIView(views.APIView):
     
-    serializers_class = UserRankSerializer
+    serializer_class = UserRankSerializer
+    
+    # 今日の日付を取得
+    TODAY = datetime.date.today()
+    
+    def patch(self, request: Request, *args, **kwargs):
+        
+        '''
+        cronで日付が更新されたタイミングでuser_idに紐ずくユーザのランク更新
+        
+        レスポンス形式
+        
+        Userごとに
+        {
+            "user_id": str
+            "level": int
+        }
+        '''
+        
+        user_all = User.objects.all()
+        
+        # response data
+        return_data = list()
+        
+        # 全ユーザの今日の記録を更新
+        for user in user_all:
+            print(user.user_id)
+            # FitbitでClient情報を取得
+            client = fitbit.Fitbit(user.client_id, user.client_secret,
+                        access_token = user.access_token,
+                        refresh_token = user.refresh_token,
+                        refresh_cb=updateToken)
+            
+            # 昨日の達成したrateを取得
+            user_rank = get_object_or_404(UserRank, user=user.user_id)
+            rate = user_rank.rate
+            
+            data_update = {
+                'rank': int(user_rank.rank + rate),
+                'rate': 0,
+            }
+            
+            # データの更新
+            serializer = self.serializer_class(instance=user_rank, data=data_update, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            
+            
+            return_data.append({
+                "user_id": user.user_id,
+                "level": int(user_rank.rank)
+            })
+            
+        
+        return Response(data=return_data, status=status.HTTP_200_OK)
+    
     
     def get(self, request: Request, user_id: str, *args, **kwargs):
         
@@ -331,6 +386,7 @@ class RankAPIView(views.APIView):
             is_calories = True
         
         data = {
+            'rate': rate,
             'is_sleep': is_sleep,
             'is_steps': is_steps,
             'is_calories': is_calories,
