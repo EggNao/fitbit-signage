@@ -1,0 +1,9 @@
+Django==3.2
+mysqlclient
+djangorestframework
+django-filter
+python-dotenv
+djangorestframework-camel-case
+django-cors-headers
+fitbit
+pandas
