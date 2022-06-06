@@ -1,9 +1,0 @@
-{
-  "css.lint.unknownAtRules": "ignore",
-  "files.exclude": {
-    "front/node_modules": true,
-    "front/dist": true,
-    "front/yarn.lock": true
-  },
-  "eslint.workingDirectories": ["./front"]
-}
