@@ -1,0 +1,42 @@
+version: '3.5'
+
+services:
+
+  # MySQLコンテナ
+  db:
+    image: mysql:8.0
+    container_name: mysqldb
+    # command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci → my.cnfに記載
+
+    platform: linux/amd64
+
+    environment:
+      MYSQL_ROOT_PASSWORD: ${ROOTPASS}
+      MYSQL_DATABASE: ${DATABASE}
+      MYSQL_USER: ${USERNAME}
+      MYSQL_PASSWORD: ${USERPASS}
+      TZ: 'Asia/Tokyo'
+
+    # bind mount
+    volumes:
+      - fitbit-signage-mysql:/var/lib/mysql
+      - ./mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+
+  # Django APIコンテナ
+  api:
+    build: ./fitbit_signage_api/
+    container_name: "fitbit-signage-api"
+    volumes:
+      - ./fitbit_signage_api/src:/src
+    tty: true
+    command: 
+      python3 manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+# volumeの定義
+volumes:
+  fitbit-signage-mysql:
+    driver: local
