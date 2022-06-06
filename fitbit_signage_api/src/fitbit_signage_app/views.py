@@ -160,6 +160,7 @@ class DailyAPIView(views.APIView):
             "user_id": str
             "steps'": int,
 	        "calories": int,
+            "weight": float
             "sleep_score": int, 
             "sleep_minutes": int, 
         }
@@ -184,6 +185,9 @@ class DailyAPIView(views.APIView):
             daily_data = client.make_request("https://api.fitbit.com/1/user/-/activities/date/"+ str(self.TODAY) +".json")
             steps_daily = daily_data['summary']['steps']
             calories_daily = daily_data['summary']['caloriesOut']
+            
+            # 体重を取得
+            user_weight = client.make_request("https://api.fitbit.com/1/user/-/profile.json")['user']['weight'] / 2.2046
 
             
             sleep_data = client.make_request("https://api.fitbit.com/1.2/user/-/sleep/date/"+ str(self.TODAY) +".json")['sleep']
@@ -197,7 +201,7 @@ class DailyAPIView(views.APIView):
                 sleep_minutes = 0
             
             
-            data_daily = { "user": user.user_id, "sleep_score": sleep_efficiency, 'sleep_minutes': sleep_minutes, "steps": steps_daily, "calories": calories_daily }
+            data_daily = { "user": user.user_id, "sleep_score": sleep_efficiency, 'sleep_minutes': sleep_minutes, "steps": steps_daily, "calories": calories_daily, "weight": user_weight }
             serializer = self.serializer_class(data=data_daily)
             serializer.is_valid(raise_exception=True)
             serializer.save()
@@ -656,16 +660,17 @@ class RecommendExerciseAPIView(views.APIView):
         # 今日の日付を取得
         datetime_today = datetime.date.today()
         
+        user_daily = DailyScore.objects.filter(user=user_id, created_at__range=(datetime_today, datetime_today+datetime.timedelta(days=1))).order_by('-created_at').first()
+        
         # 今日のカロリー消費を取得
-        user_calories_today = (DailyScore.objects.filter(user=user_id, created_at__range=(datetime_today, datetime_today+datetime.timedelta(days=1)))
-                                .order_by('-created_at').values('calories').first())['calories']
+        user_calories_today = user_daily.calories
+        
+        # 体重を取得
+        user_weight = user_daily.weight
         
         # カロリー消費の目標値を取得
         user_goal = (UserGoal.objects.filter(user=user_id, created_at__range=(datetime_today, datetime_today+datetime.timedelta(days=1)))
                         .order_by('-created_at').values('calories_goal').first())['calories_goal']
-        
-        # 体重を取得
-        user_weight = client.make_request("https://api.fitbit.com/1/user/-/profile.json")['user']['weight'] / 2.2046
 
         # 今日の残りの [METs・時] 算出
         # METs : 運動強度
