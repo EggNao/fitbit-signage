@@ -17,6 +17,8 @@ def updateToken(token):
     instance = get_object_or_404(User, user_id=user_id)
     print(instance.access_token) # debug
     serializer = UserSerializer(instance=instance, data={'access_token': access_token, 'refresh_token': refresh_token}, partial=True)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
     print(get_object_or_404(User, user_id=user_id).access_token) # debug
     
     return
