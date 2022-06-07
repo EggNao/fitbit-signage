@@ -43,7 +43,7 @@ class DailyScore(models.Model):
     calories = models.IntegerField()
     weight = models.FloatField(default=0)
     is_wearing = models.BooleanField(default=False)
-    # achievement = models.BooleanField(default=False)
+    achievement = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
