@@ -77,6 +77,8 @@ obniz.onconnect = async function() {
             mac_set.clear();
             ans.key = "";
             ans.rssi = -Infinity;
+        }else if(ans.key == ""){
+            pre_mac = "";
         }
-    }, 5000);
+    }, 15000);
 }
