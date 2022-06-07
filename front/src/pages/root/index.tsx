@@ -51,9 +51,6 @@ export const RootPage: React.VFC = () => {
   })
   const [recommend, setRecommend] = useState<RecommendType>({ exercise: 'run', time: 30 })
 
-  const [scanSet, setScanSet] = useState<string[]>([])
-  const [done, setDone] = useState<string[]>([])
-
   const isExist = (array: string[], value: string) => {
     for (var i = 0, len = array.length; i < len; i++) {
       if (value == array[i]) {
@@ -133,29 +130,29 @@ export const RootPage: React.VFC = () => {
     onSnapshot(qRoom, (snapshot) => {
       snapshot.forEach((doc) => {
         const data = doc.data().macAddress
+
         setMacAddress(data)
-        setIsShow(true)
-        console.log('de')
-        setTimeout(() => {
-          console.log('入った')
-          setIsShow(false)
-        }, 10000)
+
       })
     })
   }, [])
 
   useEffect(() => {
-    setIsShow(true)
-    user?.forEach((doc) => {
-      if (doc[macAddress] !== undefined) {
-        fetchData(doc[macAddress])
-      }
-    })
-    name?.forEach((doc) => {
-      if (doc[macAddress] !== undefined) {
-        setCurrentUserName(doc[macAddress])
-      }
-    })
+    if (macAddress !== '000000000000') {
+      setIsShow(true)
+      user?.forEach((doc) => {
+        if (doc[macAddress] !== undefined) {
+          fetchData(doc[macAddress])
+        }
+      })
+      name?.forEach((doc) => {
+        if (doc[macAddress] !== undefined) {
+          setCurrentUserName(doc[macAddress])
+        }
+      })
+    } else {
+      setIsShow(false)
+    }
   }, [macAddress])
 
   return (
