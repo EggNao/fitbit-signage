@@ -18,8 +18,8 @@ const firestore = getFirestore(firebaseApp)
 const obniz = new Obniz("3294-6696"); // 8桁のID
 
 var mac_set = new Set(); // MACアドレスを格納する集合
-var ans = { key: "", rssi: -Infinity }; //RSSI値とそのBeaconのMACアドレス
-var pre_mac = "";
+var ans = { key: "000000000000", rssi: -100000000 }; //RSSI値とそのBeaconのMACアドレス
+var pre_mac = "000000000000";
 
 obniz.onconnect = async function() {
 
@@ -59,7 +59,7 @@ obniz.onconnect = async function() {
 
     setInterval(() => {
 
-        if (ans.key != "" && pre_mac != ans.key) {
+        if (pre_mac != ans.key) {
             // firebaseに追加
             const docData = {
                 macAdress: ans.key,
@@ -75,8 +75,11 @@ obniz.onconnect = async function() {
 
             //Setと表示するユーザ情報をクリア
             mac_set.clear();
-            ans.key = "";
-            ans.rssi = -Infinity;
+            ans.key = "000000000000";
+            ans.rssi = -100000000;
+        } else if (ans.key == "000000000000") {
+            //表示したユーザのMACアドレスを記録
+            pre_mac = ans.key;
         }
-    }, 5000);
+    }, 15000);
 }
