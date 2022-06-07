@@ -40,16 +40,6 @@ class FitbitAPIView(views.APIView):
         
         '''
         
-        # ユーザ情報の取り出し
-        client_obj = get_object_or_404(User, user_id=user_id)
-        
-        # FitbitでClient情報を取得
-        client = fitbit.Fitbit(client_obj.client_id, client_obj.client_secret,
-                       access_token = client_obj.access_token,
-                       refresh_token = client_obj.refresh_token,
-                       refresh_cb=updateToken)
-        
-
         today_data = DailyScore.objects.filter(user=user_id, created_at__range=(self.TODAY, self.TODAY+datetime.timedelta(days=1))).order_by('-created_at').first()
         
         # response data
@@ -160,6 +150,7 @@ class DailyAPIView(views.APIView):
             "user_id": str
             "steps'": int,
 	        "calories": int,
+            "weight": float
             "sleep_score": int, 
             "sleep_minutes": int, 
         }
@@ -184,8 +175,11 @@ class DailyAPIView(views.APIView):
             daily_data = client.make_request("https://api.fitbit.com/1/user/-/activities/date/"+ str(self.TODAY) +".json")
             steps_daily = daily_data['summary']['steps']
             calories_daily = daily_data['summary']['caloriesOut']
-
             
+            # 体重を取得
+            user_weight = client.make_request("https://api.fitbit.com/1/user/-/profile.json")['user']['weight'] / 2.2046
+
+            # 睡眠データ取得
             sleep_data = client.make_request("https://api.fitbit.com/1.2/user/-/sleep/date/"+ str(self.TODAY) +".json")['sleep']
             if sleep_data:
                 # 睡眠効率を取得
@@ -196,8 +190,19 @@ class DailyAPIView(views.APIView):
                 sleep_efficiency = 0
                 sleep_minutes = 0
             
+            # fitbitを装着したかチェック
+            # Get Daily Activity Summary
+            active_data = client.make_request("https://api.fitbit.com/1/user/-/activities/date/"+ str(self.TODAY) +".json")['summary']
+            print(active_data) # debug
             
-            data_daily = { "user": user.user_id, "sleep_score": sleep_efficiency, 'sleep_minutes': sleep_minutes, "steps": steps_daily, "calories": calories_daily }
+            wearing = False
+            
+            # active_dataに心拍の記録がなければ装着していない
+            if 'heartRateZones' in active_data:
+                wearing = True
+            
+            
+            data_daily = { "user": user.user_id, "sleep_score": sleep_efficiency, 'sleep_minutes': sleep_minutes, "steps": steps_daily, "calories": calories_daily, "weight": user_weight, "is_wearing": wearing }
             serializer = self.serializer_class(data=data_daily)
             serializer.is_valid(raise_exception=True)
             serializer.save()
@@ -305,11 +310,6 @@ class RankAPIView(views.APIView):
         # 全ユーザの今日の記録を更新
         for user in user_all:
             print(user.user_id)
-            # FitbitでClient情報を取得
-            client = fitbit.Fitbit(user.client_id, user.client_secret,
-                        access_token = user.access_token,
-                        refresh_token = user.refresh_token,
-                        refresh_cb=updateToken)
             
             # 昨日の達成したrateを取得
             user_rank = get_object_or_404(UserRank, user=user.user_id)
@@ -347,14 +347,11 @@ class RankAPIView(views.APIView):
         }
         '''
         
-        # 今日の日付を取得
-        datetime_today = datetime.date.today()
-        
         # 現在のデータを取得
-        today_data = DailyScore.objects.filter(user=user_id, created_at__range=(datetime_today, datetime_today+datetime.timedelta(days=1))).order_by('-created_at').first()
+        today_data = DailyScore.objects.filter(user=user_id, created_at__range=(self.TODAY, self.TODAY+datetime.timedelta(days=1))).order_by('-created_at').first()
         
         # 目標値を取得
-        user_goal = UserGoal.objects.filter(user=user_id, created_at__range=(datetime_today, datetime_today+datetime.timedelta(days=1))).order_by('-created_at').first()
+        user_goal = UserGoal.objects.filter(user=user_id, created_at__range=(self.TODAY, self.TODAY+datetime.timedelta(days=1))).order_by('-created_at').first()
         
         # ユーザのランクを取得
         user_rank = get_object_or_404(UserRank, user=user_id)
@@ -631,6 +628,9 @@ class StepPerHourAPIView(views.APIView):
 
 class RecommendExerciseAPIView(views.APIView):
     
+    # 今日の日付を取得
+    TODAY = datetime.date.today()
+    
     def get(self, request: Request, user_id: str,  *args, **kwargs):
         
         '''
@@ -644,70 +644,69 @@ class RecommendExerciseAPIView(views.APIView):
         
         '''
         
-        # ユーザ情報の取り出し
-        client_obj = get_object_or_404(User, user_id=user_id)
-        
-        # FitbitでClient情報を取得
-        client = fitbit.Fitbit(client_obj.client_id, client_obj.client_secret,
-                    access_token = client_obj.access_token,
-                    refresh_token = client_obj.refresh_token,
-                    refresh_cb=updateToken)
-        
-        # 今日の日付を取得
-        datetime_today = datetime.date.today()
+        user_daily = DailyScore.objects.filter(user=user_id, created_at__range=(self.TODAY, self.TODAY+datetime.timedelta(days=1))).order_by('-created_at').first()
         
         # 今日のカロリー消費を取得
-        user_calories_today = (DailyScore.objects.filter(user=user_id, created_at__range=(datetime_today, datetime_today+datetime.timedelta(days=1)))
-                                .order_by('-created_at').values('calories').first())['calories']
-        
-        # カロリー消費の目標値を取得
-        user_goal = (UserGoal.objects.filter(user=user_id, created_at__range=(datetime_today, datetime_today+datetime.timedelta(days=1)))
-                        .order_by('-created_at').values('calories_goal').first())['calories_goal']
+        user_calories_today = user_daily.calories
         
         # 体重を取得
-        user_weight = client.make_request("https://api.fitbit.com/1/user/-/profile.json")['user']['weight'] / 2.2046
+        user_weight = user_daily.weight
+        
+        if user_weight > 0:
+        
+        # カロリー消費の目標値を取得
+            user_goal = (UserGoal.objects.filter(user=user_id, created_at__range=(self.TODAY, self.TODAY+datetime.timedelta(days=1)))
+                            .order_by('-created_at').values('calories_goal').first())['calories_goal']
 
-        # 今日の残りの [METs・時] 算出
-        # METs : 運動強度
-        # 1MET=3.5mL/kg/分の酸素摂取量
-        mets_hour = (user_goal - user_calories_today) / user_weight
-        
-        # 各運動のMETs
-        exercise = {
-            'run': 7.0,
-            'walk': 3.0,
-            'fastwalk': 4.3,
-            'cycling': 8.0,
-            'training': 3.5,
-        }
-        # 勧める運動とその時間を格納
-        recommend_exercise = dict()
-        
-        # response data
-        return_data = dict()
-        
-        # 目標を達成していない場合
-        if mets_hour > 0:
+            # 今日の残りの [METs・時] 算出
+            # METs : 運動強度
+            # 1MET=3.5mL/kg/分の酸素摂取量
+            mets_hour = (user_goal - user_calories_today) / user_weight
             
-            # 各運動を行うべき時間を格納
-            for name, METs in exercise.items():
-                minutes = int(mets_hour / METs * 60)
-                if minutes < 60:
-                    #  １時間以内で勧めれる運動であれば [分] で格納
-                    recommend_exercise[name] = minutes
+            # 各運動のMETs
+            exercise = {
+                'run': 7.0,
+                'walk': 3.0,
+                'fastwalk': 4.3,
+                'cycling': 8.0,
+                'training': 3.5,
+            }
+            # 勧める運動とその時間を格納
+            recommend_exercise = dict()
             
-            # １時間以内で可能な運動からランダムに選択
-            # 最適化させたい
-            if len(recommend_exercise.items()):
-                return_data['exercise'], return_data['time'] =  random.choice(list(recommend_exercise.items()))
+            # response data
+            return_data = dict()
+            
+            # 目標を達成していない場合
+            if mets_hour > 0:
+                
+                # 各運動を行うべき時間を格納
+                for name, METs in exercise.items():
+                    minutes = int(mets_hour / METs * 60)
+                    if minutes < 60:
+                        #  １時間以内で勧めれる運動であれば [分] で格納
+                        recommend_exercise[name] = minutes
+                
+                # １時間以内で可能な運動からランダムに選択
+                # 最適化させたい
+                if len(recommend_exercise.items()):
+                    return_data['exercise'], return_data['time'] =  random.choice(list(recommend_exercise.items()))
+                else:
+                    return_data['exercise'] = 'cycling'
+                    return_data['time'] = int(mets_hour / exercise['cycling'] * 60)
+
+            # 目標を達成している場合
             else:
-                return_data['exercise'] = 'cycling'
-                return_data['time'] = int(mets_hour / exercise['cycling'] * 60)
-
-        # 目標を達成している場合
+                return_data['exercise'] = 'done'
+                return_data['time'] = -1
+                
+        # 体重を設定してない場合
         else:
-            return_data['exercise'] = 'done'
-            return_data['time'] = -1
+            # response data
+            return_data = {
+                "exercise": '',
+                'time': -1
+            }
             
         return Response(data=return_data, status=status.HTTP_200_OK)
     
@@ -728,28 +727,12 @@ class FitbitWearCheckAPIView(views.APIView):
         
         '''
         
-        # ユーザ情報の取り出し
-        client_obj = get_object_or_404(User, user_id=user_id)
-        
-        # FitbitでClient情報を取得
-        client = fitbit.Fitbit(client_obj.client_id, client_obj.client_secret,
-                    access_token = client_obj.access_token,
-                    refresh_token = client_obj.refresh_token,
-                    refresh_cb=updateToken)
-        
-        # Get Daily Activity Summary
-        active_data = client.make_request("https://api.fitbit.com/1/user/-/activities/date/"+ str(self.TODAY) +".json")['summary']
-        print(active_data)
-        
-        wearing = False
-        
-        # active_dataに心拍の記録がなければ装着していない
-        if 'heartRateZones' in active_data:
-            wearing = True
+        # 今日のデータを取得
+        today_data =  DailyScore.objects.filter(user=user_id, created_at__range=(self.TODAY, self.TODAY+datetime.timedelta(days=1))).order_by('-created_at').first()
             
         # response data
         return_data = {
-            "wearing": wearing
+            "wearing": today_data.is_wearing
         }
         
         return Response(data=return_data, status=status.HTTP_200_OK)

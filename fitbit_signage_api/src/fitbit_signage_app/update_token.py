@@ -11,6 +11,7 @@ def updateToken(token):
     user_id = token['user_id']
     access_token = token['access_token']
     refresh_token = token['refresh_token']
+    print(token) # debug
     
     # update db
     instance = get_object_or_404(User, user_id=user_id)

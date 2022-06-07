@@ -41,7 +41,9 @@ class DailyScore(models.Model):
     sleep_minutes = models.IntegerField()
     steps = models.IntegerField()
     calories = models.IntegerField()
-    achievement = models.BooleanField(default=False)
+    weight = models.FloatField(default=0)
+    is_wearing = models.BooleanField(default=False)
+    # achievement = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
