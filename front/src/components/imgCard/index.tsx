@@ -1,5 +1,3 @@
-import clsx from 'clsx'
-
 import fat from '~/assets/fat.png'
 import muscul from '~/assets/muscul.png'
 import normal from '~/assets/normal.png'

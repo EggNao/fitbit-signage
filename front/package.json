@@ -24,6 +24,7 @@
     ]
   },
   "dependencies": {
+    "@farbenmeer/react-spring-slider": "^1.5.2",
     "apexcharts": "^3.35.2",
     "axios": "^0.27.2",
     "clsx": "^1.1.1",
