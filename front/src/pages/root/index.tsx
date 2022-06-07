@@ -11,55 +11,17 @@ import { RadialBarChartCard } from '~/components/radialBarChartCard'
 import { WalkChartCard } from '~/components/walkChartCard'
 import { firebaseRef } from '~/data/schema'
 import { firestore } from '~/plugins/firebase'
-
-export type TodayMoveDataType = {
-  calorie: number
-  sleep: number
-  steps: number
-}
-
-export type GoalsType = {
-  calorie: number
-  sleep: number
-  steps: number
-}
-
-export type RankType = {
-  level: number
-  rate: number
-}
-
-export type WeekMoveDataType = {
-  dataArray: {
-    steps: number[]
-    sleep: number[]
-    calorie: number[]
-  }
-  dateArray: string[]
-}
-
-export type StampType = {
-  dateArray: string[]
-  stamp: boolean[]
-}
-
-export type TodayStepsType = {
-  goals: number[]
-  steps: number[]
-}
-
-export type RecommendType = {
-  exercise: 'run' | 'fastwalk' | 'cycling' | 'training' | 'walk' | 'done'
-  time: number
-}
-
-export type UserType = {
-  [s: string]: string
-}[]
-
-export type NameType = {
-  [s: string]: string
-}[]
+import {
+  NameType,
+  UserType,
+  TodayMoveDataType,
+  GoalsType,
+  RankType,
+  WeekMoveDataType,
+  StampType,
+  TodayStepsType,
+  RecommendType,
+} from '~/types/types'
 
 export const RootPage: React.VFC = () => {
   const [name, setName] = useState<NameType | undefined>()
