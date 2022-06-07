@@ -1,3 +1,4 @@
+import Slider from '@farbenmeer/react-spring-slider'
 import axios from 'axios'
 import { collection, limit, onSnapshot, orderBy, query } from 'firebase/firestore'
 import { useEffect, useRef, useState } from 'react'
@@ -89,8 +90,6 @@ export const RootPage: React.VFC = () => {
   const [recommend, setRecommend] = useState<RecommendType>({ exercise: 'run', time: 30 })
 
   const [timerId, setTimerId] = useState<NodeJS.Timeout | undefined>()
-
-  const [mount, setMount] = useState<boolean>(false)
 
   const fetchData = async (id: string) => {
     await axios
@@ -211,13 +210,12 @@ export const RootPage: React.VFC = () => {
     name?.forEach((obj) => {
       console.log(obj[macAddress])
     })
-    console.log('aaa')
     console.log(name)
   }, [name])
 
   return (
     <div>
-      {isShow === true && (
+      {isShow === false && (
         <div className='p-2 h-screen bg-slate-100'>
           <div className='flex justify-between'>
             <h1 className='text-7xl p-8'>Good Morning！{currentUserName}さん！</h1>
@@ -229,17 +227,31 @@ export const RootPage: React.VFC = () => {
             <RadialBarChartCard goal={goals} value={todayMoveData} />
           </div>
           <div className='flex grid grid-cols-2'>
-            <LineChartCard
-              dataArray={weekMoveData.dataArray}
-              dateArray={weekMoveData.dateArray}
-              scoreType={'steps'}
-              color={'green'}
-            />
+            <Slider activeIndex={2} auto={5000}>
+              <LineChartCard
+                dataArray={weekMoveData.dataArray}
+                dateArray={weekMoveData.dateArray}
+                scoreType={'steps'}
+                color={'green'}
+              />
+              <LineChartCard
+                dataArray={weekMoveData.dataArray}
+                dateArray={weekMoveData.dateArray}
+                scoreType={'sleep'}
+                color={'green'}
+              />
+              <LineChartCard
+                dataArray={weekMoveData.dataArray}
+                dateArray={weekMoveData.dateArray}
+                scoreType={'calorie'}
+                color={'green'}
+              />
+            </Slider>
             <WalkChartCard stepsArray={todaySteps} />
           </div>
         </div>
       )}
-      {isShow === false && <img src={Home} alt='' className='h-screen' />}
+      {isShow === true && <img src={Home} alt='' className='h-screen' />}
     </div>
   )
 }
