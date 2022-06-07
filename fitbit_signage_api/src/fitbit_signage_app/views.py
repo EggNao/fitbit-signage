@@ -390,7 +390,7 @@ class RankAPIView(views.APIView):
         }
         
         # update db
-        serializer = self.serializers_class(instance=user_rank, data=data, partial=True)
+        serializer = self.serializer_class(instance=user_rank, data=data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         
