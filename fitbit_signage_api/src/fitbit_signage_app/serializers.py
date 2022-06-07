@@ -35,5 +35,5 @@ class DailyScoreSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = DailyScore
-        fields = ('user', 'sleep_score', 'sleep_minutes', 'steps', 'calories', 'weight', 'is_wearing')
+        fields = ('user', 'sleep_score', 'sleep_minutes', 'steps', 'calories', 'weight', 'is_wearing', 'achievement')
 
