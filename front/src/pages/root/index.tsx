@@ -132,6 +132,7 @@ export const RootPage: React.VFC = () => {
         const data = doc.data().macAddress
 
         setMacAddress(data)
+
       })
     })
   }, [])
