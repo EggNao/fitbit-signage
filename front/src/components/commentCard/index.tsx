@@ -1,5 +1,3 @@
-import clsx from 'clsx'
-
 export type commentCardProps = {
   move: 'run' | 'fastwalk' | 'cycling' | 'training' | 'walk' | 'done'
   time: number

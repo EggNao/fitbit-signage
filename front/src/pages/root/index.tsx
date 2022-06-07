@@ -1,10 +1,6 @@
 import axios from 'axios'
-import dayjs from 'dayjs'
-import { collection, connectFirestoreEmulator, limit, onSnapshot, orderBy, query } from 'firebase/firestore'
+import { collection, limit, onSnapshot, orderBy, query } from 'firebase/firestore'
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-location'
-
-import { useRoot } from './hook'
 
 import Home from '~/assets/home.png'
 import { CommentCard } from '~/components/commentCard'
@@ -14,7 +10,6 @@ import { RadialBarChartCard } from '~/components/radialBarChartCard'
 import { WalkChartCard } from '~/components/walkChartCard'
 import { firebaseRef } from '~/data/schema'
 import { firestore } from '~/plugins/firebase'
-import { PATH } from '~/router/path'
 
 export type TodayMoveDataType = {
   calorie: number
