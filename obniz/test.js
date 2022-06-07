@@ -20,6 +20,7 @@ const obniz = new Obniz("3294-6696"); // 8桁のID
 var mac_set = new Set(); // MACアドレスを格納する集合
 var ans = { key: "000000000000", rssi: -100000000 }; //RSSI値とそのBeaconのMACアドレス
 var pre_mac = "000000000000";
+var flg = false;
 
 obniz.onconnect = async function() {
 
@@ -60,26 +61,43 @@ obniz.onconnect = async function() {
     setInterval(() => {
 
         if (pre_mac != ans.key) {
-            // firebaseに追加
-            const docData = {
-                macAdress: ans.key,
-                createdAt: new Date(),
-                rssi: ans.rssi
-            };
-            addDoc(collection(firestore, 'room'), docData);
-            console.log(ans)
-            console.log('保存しました');
+            if(ans.key == "000000000000" ){
+                if(flg){
+                    flg = false;
+                    // firebaseに追加
+                    const docData = {
+                        macAdress: ans.key,
+                        createdAt: new Date(),
+                        rssi: ans.rssi
+                    };
+                    addDoc(collection(firestore, 'room'), docData);
+                    console.log(ans)
+                    console.log('保存しました');
 
-            //表示したユーザのMACアドレスを記録
-            pre_mac = ans.key;
+                    //表示したユーザのMACアドレスを記録
+                    pre_mac = ans.key;
+                }else{
+                    flg = true;
+                }
+            }else{
+                // firebaseに追加
+                const docData = {
+                    macAdress: ans.key,
+                    createdAt: new Date(),
+                    rssi: ans.rssi
+                };
+                addDoc(collection(firestore, 'room'), docData);
+                console.log(ans)
+                console.log('保存しました');
 
-            //Setと表示するユーザ情報をクリア
-            mac_set.clear();
-            ans.key = "000000000000";
-            ans.rssi = -100000000;
-        } else if (ans.key == "000000000000") {
-            //表示したユーザのMACアドレスを記録
-            pre_mac = ans.key;
+                //表示したユーザのMACアドレスを記録
+                pre_mac = ans.key;
+
+                //Setと表示するユーザ情報をクリア
+                mac_set.clear();
+                ans.key = "000000000000";
+                ans.rssi = -100000000;
+             }
         }
     }, 15000);
 }
