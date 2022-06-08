@@ -10,7 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ('user_id', 'client_id', 'client_secret', 'name', 'rank', 'access_token', 'refresh_token')
+        fields = ('user_id', 'client_id', 'client_secret', 'name', 'access_token', 'refresh_token')
         read_only_fields = ('user_id', 'client_id', 'client_secret')
         
 class UserRankSerializer(serializers.ModelSerializer):
