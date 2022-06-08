@@ -1,6 +1,6 @@
 import Slider from '@farbenmeer/react-spring-slider'
 import axios from 'axios'
-import { collection, limit, onSnapshot, orderBy, query } from 'firebase/firestore'
+import { collection, connectFirestoreEmulator, limit, onSnapshot, orderBy, query } from 'firebase/firestore'
 import { useEffect, useRef, useState } from 'react'
 
 import Home from '~/assets/home.png'
@@ -24,8 +24,8 @@ import {
 } from '~/types/types'
 
 export const RootPage: React.VFC = () => {
-  const [name, setName] = useState<NameType | undefined>()
-  const [currentUserName, setCurrentUserName] = useState<string>('')
+  const [name, setName] = useState<NameType | undefined>() // macaddress: name
+  const [currentUserName, setCurrentUserName] = useState<string>('') // macAddress: userId
   const [macAddress, setMacAddress] = useState<string>('')
   const [isShow, setIsShow] = useState<boolean>(false)
   const [user, setUser] = useState<UserType>()
@@ -51,7 +51,16 @@ export const RootPage: React.VFC = () => {
   })
   const [recommend, setRecommend] = useState<RecommendType>({ exercise: 'run', time: 30 })
 
-  const [timerId, setTimerId] = useState<NodeJS.Timeout | undefined>()
+  const isExist = (array: string[], value: string) => {
+    for (var i = 0, len = array.length; i < len; i++) {
+      if (value == array[i]) {
+        // 存在したらtrueを返す
+        return true
+      }
+    }
+    // 存在しない場合falseを返す
+    return false
+  }
 
   const fetchData = async (id: string) => {
     await axios
@@ -105,25 +114,6 @@ export const RootPage: React.VFC = () => {
       .catch((error) => console.log(error))
   }
 
-  const usePreviousAddressValue = (value: string) => {
-    const previousValue = useRef(value)
-    useEffect(() => {
-      previousValue.current = value
-    }, [value])
-    return previousValue.current
-  }
-
-  const usePreviousTimerValue = (value: NodeJS.Timeout | undefined) => {
-    const previousValue = useRef(value)
-    useEffect(() => {
-      previousValue.current = value
-    }, [value])
-    return previousValue.current
-  }
-
-  const PreviousMacAddress = usePreviousAddressValue(macAddress)
-  const PreviousTimerId = usePreviousTimerValue(timerId)
-
   useEffect(() => {
     const qUser = query(collection(firestore, 'user'))
     onSnapshot(qUser, (snapshot) => {
@@ -140,44 +130,33 @@ export const RootPage: React.VFC = () => {
     onSnapshot(qRoom, (snapshot) => {
       snapshot.forEach((doc) => {
         const data = doc.data().macAddress
+
         setMacAddress(data)
-        setIsShow(true)
-        const timer = setTimeout(() => {
-          setIsShow(false)
-        }, 10000)
-        setTimerId(timer)
       })
     })
   }, [])
 
   useEffect(() => {
-    setIsShow(true)
-    console.log(user)
-    console.log(macAddress)
-    user?.forEach((doc) => {
-      if (PreviousMacAddress !== macAddress && doc[macAddress] !== undefined) {
-        fetchData(doc[macAddress])
-      }
-      clearTimeout(PreviousTimerId!)
-    })
-    name?.forEach((doc) => {
-      if (doc[macAddress] !== undefined) {
-        console.log(doc[macAddress])
-        setCurrentUserName(doc[macAddress])
-      }
-    })
+    if (macAddress !== '000000000000') {
+      setIsShow(true)
+      user?.forEach((doc) => {
+        if (doc[macAddress] !== undefined) {
+          fetchData(doc[macAddress])
+        }
+      })
+      name?.forEach((doc) => {
+        if (doc[macAddress] !== undefined) {
+          setCurrentUserName(doc[macAddress])
+        }
+      })
+    } else {
+      setIsShow(false)
+    }
   }, [macAddress])
-
-  useEffect(() => {
-    name?.forEach((obj) => {
-      console.log(obj[macAddress])
-    })
-    console.log(name)
-  }, [name])
 
   return (
     <div>
-      {isShow === false && (
+      {isShow && (
         <div className='p-2 h-screen bg-slate-100'>
           <div className='flex justify-between'>
             <h1 className='text-7xl p-8'>Good Morning！{currentUserName}さん！</h1>
@@ -213,7 +192,7 @@ export const RootPage: React.VFC = () => {
           </div>
         </div>
       )}
-      {isShow === true && <img src={Home} alt='' className='h-screen' />}
+      {!isShow && <img src={Home} alt='' className='h-screen' />}
     </div>
   )
 }
