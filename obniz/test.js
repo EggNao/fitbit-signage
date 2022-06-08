@@ -61,6 +61,7 @@ obniz.onconnect = async function() {
     setInterval(() => {
 
         if (pre_mac != ans.key) {
+
             if(ans.key == "000000000000" ){
                 if(flg){
                     flg = false;
