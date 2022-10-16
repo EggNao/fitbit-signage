@@ -552,41 +552,41 @@ class StepPerHourAPIView(views.APIView):
         #### 過去のデータ #####
         
         # 過去７日間の日付
-        date_range = sorted([self.TODAY - datetime.timedelta(days=i) for i in range(1, 7)])
+        # date_range = sorted([self.TODAY - datetime.timedelta(days=i) for i in range(1, 7)])
         
-        # 過去１週間のデータを取得
-        for date in date_range:
-            daily_data =  DailyScore.objects.filter(user=user_id, created_at__range=(date, date+datetime.timedelta(days=1))).order_by('-created_at').first()
-            # 目標を達成していたかどうか
-            if daily_data and daily_data.achievement:
+        # # 過去１週間のデータを取得
+        # for date in date_range:
+        #     daily_data =  DailyScore.objects.filter(user=user_id, created_at__range=(date, date+datetime.timedelta(days=1))).order_by('-created_at').first()
+        #     # 目標を達成していたかどうか
+        #     if daily_data and daily_data.achievement:
                 
-                # 過去の歩数データを取得
-                step_data_ago = client.intraday_time_series('activities/steps', base_date=date, detail_level='15min', start_time="06:00", end_time="20:00")["activities-steps-intraday"]["dataset"]
-                # transfer DataFrame
-                df_step_data_ago = pd.DataFrame.from_dict(step_data_ago)
-                # timeにindexを貼る
-                df_step_data_ago.index = df_step_data_ago["time"]
+        #         # 過去の歩数データを取得
+        #         step_data_ago = client.intraday_time_series('activities/steps', base_date=date, detail_level='15min', start_time="06:00", end_time="20:00")["activities-steps-intraday"]["dataset"]
+        #         # transfer DataFrame
+        #         df_step_data_ago = pd.DataFrame.from_dict(step_data_ago)
+        #         # timeにindexを貼る
+        #         df_step_data_ago.index = df_step_data_ago["time"]
                 
-                # 過去の１時間ごとの歩数データリスト
-                steps_ago = list()
+        #         # 過去の１時間ごとの歩数データリスト
+        #         steps_ago = list()
                 
-                for i in range(14):
-                    # 取得時刻の開始と終了
-                    start_time = datetime.time(6+i, 0, 0)
-                    end_time = datetime.time(7+i, 0, 0)
+        #         for i in range(14):
+        #             # 取得時刻の開始と終了
+        #             start_time = datetime.time(6+i, 0, 0)
+        #             end_time = datetime.time(7+i, 0, 0)
                     
-                    # datetimeをstrに変換
-                    str_start_time = start_time.strftime("%H:%M:%S")
-                    str_end_time = end_time.strftime("%H:%M:%S")
+        #             # datetimeをstrに変換
+        #             str_start_time = start_time.strftime("%H:%M:%S")
+        #             str_end_time = end_time.strftime("%H:%M:%S")
                     
-                    # １時間の歩数データ
-                    df_step_hour_ago = df_step_data_ago[str_start_time : str_end_time]
-                    steps_ago.append(df_step_hour_ago['value'].sum())
+        #             # １時間の歩数データ
+        #             df_step_hour_ago = df_step_data_ago[str_start_time : str_end_time]
+        #             steps_ago.append(df_step_hour_ago['value'].sum())
                 
-                steps_goal = steps_ago
+        #         steps_goal = steps_ago
                 
-                # 近日のデータが取れたのでループを抜ける
-                break
+        #         # 近日のデータが取れたのでループを抜ける
+        #         break
                 
                 
         
