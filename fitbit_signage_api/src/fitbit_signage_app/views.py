@@ -661,16 +661,26 @@ class RecommendExerciseAPIView(views.APIView):
             # 今日の残りの [METs・時] 算出
             # METs : 運動強度
             # 1MET=3.5mL/kg/分の酸素摂取量
-            mets_hour = (user_goal - user_calories_today) / user_weight
+            mets_hour = (user_goal - user_calories_today - 500) / user_weight
+            # mets_hour = (user_goal - user_calories_today) / user_weight
             
             # 各運動のMETs
             exercise = {
-                'run': 7.0,
-                'walk': 3.0,
-                'fastwalk': 4.3,
-                'cycling': 8.0,
-                'training': 3.5,
+                'run': 8.0,
+                'walk': 4.5,
+                'fastwalk': 5.8,
+                'cycling': 9.0,
+                'training': 5.5,
             }
+            # exercise = {
+            #     'run': 7.0,
+            #     'walk': 3.0,
+            #     'fastwalk': 4.3,
+            #     'cycling': 8.0,
+            #     'training': 3.5,
+            # }
+            
+            
             # 勧める運動とその時間を格納
             recommend_exercise = dict()
             

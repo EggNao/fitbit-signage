@@ -43,6 +43,9 @@ export const LineChart: React.VFC<LineChartProps> = ({ dataArray, dateArray, sco
       height: 200,
     },
     colors: colorType[color],
+    dataLabels: {
+      enabled: true,
+    },
     tooltip: {
       x: {
         format: 'MM/DD',
