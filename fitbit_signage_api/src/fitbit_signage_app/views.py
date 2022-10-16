@@ -680,7 +680,6 @@ class RecommendExerciseAPIView(views.APIView):
             #     'training': 3.5,
             # }
             
-            
             # 勧める運動とその時間を格納
             recommend_exercise = dict()
             
